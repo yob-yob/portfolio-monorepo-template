@@ -1,0 +1,23 @@
+{
+  "name": "asset-tracking",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --parallel --workspaces --if-present dev",
+    "build": "bun run --sequential --workspaces --if-present build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^6"
+  },
+  "catalog": {
+    "typescript": "^6.0.2"
+  }
+}

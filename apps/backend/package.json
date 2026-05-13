@@ -1,0 +1,30 @@
+{
+  "name": "@asset-tracking/backend",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build --compile --target=bun --production --outfile dist/server src/index.ts",
+    "serve": "./dist/server",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:migrate": "bunx drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@elysia/openapi": "^1.4.15",
+    "@elysia/static": "^1.4.11",
+    "@paralleldrive/cuid2": "^3.3.0",
+    "@sinclair/typebox": "^0.34.49",
+    "drizzle-orm": "^0.45.2",
+    "drizzle-typebox": "^0.3.3",
+    "elysia": "latest"
+  },
+  "overrides": {
+    "@sinclair/typebox": "0.32.4"
+  },
+  "exports": {
+    "./app": "./src/app.ts"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10"
+  }
+}
