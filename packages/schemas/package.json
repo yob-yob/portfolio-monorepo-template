@@ -1,7 +1,0 @@
-{
-  "name": "@asset-tracking/schemas",
-
-  "devDependencies": {
-      "@types/bun": "^1.3.13"
-  }
-}

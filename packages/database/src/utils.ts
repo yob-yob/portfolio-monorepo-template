@@ -10,8 +10,10 @@ import {
 } from 'drizzle-typebox'
 
 import type {
-    BuildSchema,
+  BuildSchema
 } from 'drizzle-typebox'
+
+import { table } from './schema'
 
 import type { Table } from 'drizzle-orm'
 
@@ -95,12 +97,9 @@ export const spreads = <
     [K in keyof T]: Spread<T[K], Mode>
 } => {
     const newSchema: Record<string, unknown> = {}
+    const keys = Object.keys(models)
 
-    for (const key of Object.keys(models)) {
-        const schema = models[key as keyof T]
-        if (schema === undefined) continue
-        newSchema[key] = spread(schema, mode)
-    }
+    for (const key of keys) newSchema[key] = spread(models[key], mode)
 
     return newSchema as any
 }
