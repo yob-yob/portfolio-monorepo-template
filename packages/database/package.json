@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@sinclair/typebox": "0.34.0",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "0.45.2",
     "drizzle-typebox": "^0.3.3"
   },
   "devDependencies": {
