@@ -8,12 +8,10 @@
     "serve": "./dist/server"
   },
   "dependencies": {
+    "@asset-tracking/database": "workspace:*",
     "@elysia/openapi": "^1.4.15",
     "@elysia/static": "^1.4.11",
     "elysia": "latest"
-  },
-  "overrides": {
-    "@sinclair/typebox": "0.32.4"
   },
   "exports": {
     "./app": "./src/app.ts"

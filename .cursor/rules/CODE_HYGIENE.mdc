@@ -1,0 +1,600 @@
+# CODE HYGIENE
+
+> This file defines the code quality standards for the City Asset Registry System.
+> These rules apply to all contributors — human developers and AI agents alike.
+> "It works" is not enough. Code must also be readable, consistent, and maintainable.
+
+---
+
+## Why This Matters
+
+This system manages government assets and is subject to audit. The code itself is subject to review — by other developers, by AI agents picking up work mid-project, and potentially by auditors inspecting how data is handled. Sloppy code in a compliance system creates:
+
+- Security vulnerabilities that are hard to spot
+- Bugs that are hard to reproduce and trace
+- Handoff problems when a developer or AI agent needs to continue work
+- Distrust in the system's outputs
+
+Clean code is not perfectionism — it is professional accountability.
+
+---
+
+## Automated Enforcement
+
+Most hygiene rules in this file are automatically enforced by `vp check`.
+
+```bash
+vp check         # Runs Oxfmt (format) + Oxlint (lint) + tsgolint (type-check)
+vp check --fix   # Auto-fixes formatting and autofixable lint errors
+```
+
+**Never manually adjust spacing, indentation, semicolons, or trailing commas.** Let the formatter handle it. If you find yourself fighting the formatter, stop and understand why — the formatter is almost always right.
+
+`vp check` must pass with zero errors before any commit. If it does not pass, the commit does not happen.
+
+---
+
+## TypeScript
+
+### Strict mode is always on
+
+`tsconfig.json` has `"strict": true` and it is never disabled. This enables:
+- `strictNullChecks` — no implicit `null` or `undefined`
+- `noImplicitAny` — no untyped values
+- `strictFunctionTypes` — correct function parameter variance
+- `strictPropertyInitialization` — all class properties must be initialized
+
+### No `any`
+
+`any` disables TypeScript entirely for that value. It is prohibited.
+
+```ts
+// ❌ Wrong
+function processAsset(data: any) { ... }
+
+// ✅ Correct — use unknown and narrow it
+function processAsset(data: unknown) {
+  if (typeof data !== 'object' || data === null) throw new Error('Invalid input')
+  // Now narrow further as needed
+}
+
+// ✅ Correct — define the actual type
+function processAsset(data: InsertAsset) { ... }
+```
+
+**Exception:** Third-party library internals that leak `any`. In those cases, use type assertions with a comment explaining why.
+
+### No `@ts-ignore` or `@ts-expect-error` without explanation
+
+```ts
+// ❌ Wrong — silent suppression, no explanation
+// @ts-ignore
+someFunction(badArg)
+
+// ✅ Acceptable — only if truly unavoidable, with explanation
+// @ts-expect-error: drizzle-typebox returns a union type that narrows
+// incorrectly in this context. Tracked in issue #123.
+const schema = createInsertSchema(assets)
+```
+
+If you are reaching for `@ts-ignore`, stop and reconsider the approach. There is almost always a proper solution.
+
+### Explicit return types on all exported functions
+
+```ts
+// ❌ Wrong — implicit return type
+export function getAssetById(id: string) {
+  return db.query.assets.findFirst({ where: eq(assets.id, id) })
+}
+
+// ✅ Correct — explicit return type
+export async function getAssetById(id: string): Promise<Asset | undefined> {
+  return db.query.assets.findFirst({ where: eq(assets.id, id) })
+}
+```
+
+Internal/private helper functions may use inferred return types when the type is obvious.
+
+### `type` vs `interface`
+
+- Prefer `type` for object shapes, unions, and aliases
+- Use `interface` only when you need declaration merging or extending (rare in this project)
+
+```ts
+// ✅ Preferred
+type Asset = {
+  id: string
+  assetName: string
+  departmentId: string
+}
+
+// ✅ Also fine when extending is actually needed
+interface PaginatedResponse<T> {
+  data: T[]
+  meta: PaginationMeta
+}
+```
+
+### No implicit `undefined` in function parameters
+
+```ts
+// ❌ Wrong — callers can omit this and get undefined silently
+function createAsset(name: string, departmentId?: string) { ... }
+
+// ✅ Correct — be explicit about whether the parameter is required
+function createAsset(name: string, departmentId: string): Promise<Asset> { ... }
+
+// ✅ Also correct — optional is fine when it truly is optional, but type it explicitly
+function searchAssets(query: string, limit: number = 25): Promise<Asset[]> { ... }
+```
+
+---
+
+## Imports
+
+### Use path aliases — never relative `../` chains
+
+Configure path aliases in `tsconfig.json` and `vite.config.ts`:
+
+```ts
+// ❌ Wrong — brittle, unreadable
+import { db } from '../../../db/client'
+import { assets } from '../../../../db/schema/assets'
+
+// ✅ Correct — clear, portable
+import { db } from '$db/client'
+import { assets } from '$db/schema/assets'
+import { generateId } from '$db/utils/id'
+import type { Asset } from '$db/schema/assets'
+```
+
+Recommended aliases for this project:
+
+| Alias | Maps to |
+|---|---|
+| `$lib` | `src/lib` |
+| `$db` | `src/db` |
+| `$api` | `src/api` |
+| `$components` | `src/lib/components` |
+| `$stores` | `src/lib/stores` |
+
+### Import grouping order
+
+Separate import groups with a blank line:
+
+```ts
+// 1. External packages
+import { Elysia, t } from 'elysia'
+import { eq } from 'drizzle-orm'
+
+// 2. Internal aliases
+import { db } from '$db/client'
+import { assets, departments } from '$db/schema'
+
+// 3. Type-only imports
+import type { Asset, InsertAsset } from '$db/schema/assets'
+import type { RequestContext } from '$api/types'
+```
+
+### No unused imports
+
+Unused imports are caught and failed by `vp check`. Do not leave them as "just in case". Remove them.
+
+### Type-only imports use `import type`
+
+When importing only types (not runtime values), use `import type`:
+
+```ts
+// ✅ Correct
+import type { Asset } from '$db/schema/assets'
+
+// ❌ Wrong — imports the whole module at runtime for a type only
+import { Asset } from '$db/schema/assets'
+```
+
+---
+
+## File and Directory Naming
+
+| What | Convention | Examples |
+|---|---|---|
+| All source files | kebab-case | `asset-categories.ts`, `physical-count.svelte` |
+| Drizzle schema files | `<table-name>.ts` in `src/db/schema/` | `assets.ts`, `coa-findings.ts` |
+| TypeBox schema files | `<table-name>.typebox.ts` in `src/db/typebox/` | `assets.typebox.ts` |
+| Seed files | `<entity>.seed.ts` in `src/db/seed/` | `departments.seed.ts` |
+| Test files | `<name>.test.ts` | `assets.test.ts`, `rbac.test.ts` |
+| SvelteKit route files | SvelteKit convention | `+page.svelte`, `+server.ts`, `+layout.svelte` |
+| API route groups | kebab-case directories | `src/api/assets/`, `src/api/coa-findings/` |
+| Reusable components | PascalCase `.svelte` | `AssetCard.svelte`, `DepartmentSelector.svelte` |
+| Utility files | kebab-case | `id.ts`, `date-utils.ts`, `format-currency.ts` |
+
+---
+
+## Functions
+
+### One responsibility per function
+
+A function that does two things should be two functions.
+
+```ts
+// ❌ Wrong — this function creates an asset AND sends an email AND writes an audit log
+async function createAsset(data: InsertAsset, userId: string) {
+  const asset = await db.insert(assets).values(data).returning()
+  await sendEmailNotification(userId, 'Asset created')
+  await writeAuditLog('asset.created', asset[0].id, userId)
+  return asset[0]
+}
+
+// ✅ Correct — each responsibility is separate and composable
+async function insertAsset(data: InsertAsset): Promise<Asset> {
+  const [asset] = await db.insert(assets).values(data).returning()
+  return asset
+}
+
+async function handleAssetCreation(data: InsertAsset, userId: string): Promise<Asset> {
+  const asset = await insertAsset(data)
+  await writeAuditLog('asset.created', asset.id, userId)
+  return asset
+}
+```
+
+### Keep functions short
+
+- **Target:** under 30 lines
+- **Hard limit:** 50 lines — if a function exceeds this, it almost certainly has multiple responsibilities and must be split
+- Line count includes blank lines and comments
+
+### Async/await over callbacks and raw Promises
+
+```ts
+// ❌ Wrong
+db.query.assets.findFirst({ where: eq(assets.id, id) })
+  .then(asset => { ... })
+  .catch(err => { ... })
+
+// ✅ Correct
+try {
+  const asset = await db.query.assets.findFirst({ where: eq(assets.id, id) })
+  // ...
+} catch (err) {
+  // ...
+}
+```
+
+### All async functions must handle errors
+
+Never let an async function's rejection go unhandled in a request handler. Every Elysia route handler wraps database calls in try/catch or uses Elysia's built-in error handling.
+
+```ts
+// ❌ Wrong — unhandled rejection
+.get('/api/v1/assets/:id', async ({ params }) => {
+  const asset = await db.query.assets.findFirst(...)  // can throw
+  return asset
+})
+
+// ✅ Correct — errors are caught and returned appropriately
+.get('/api/v1/assets/:id', async ({ params, error }) => {
+  try {
+    const asset = await db.query.assets.findFirst(...)
+    if (!asset) return error(404, { message: 'Asset not found' })
+    return asset
+  } catch (err) {
+    console.error('Failed to fetch asset', err)
+    return error(500, { message: 'Internal server error' })
+  }
+})
+```
+
+---
+
+## Constants
+
+### No magic numbers or strings
+
+Define named constants. Never embed literal values inline in logic.
+
+```ts
+// ❌ Wrong
+if (sessions.length > 5) { ... }
+const token = crypto.randomBytes(32).toString('hex')
+setTimeout(callback, 7200000)
+
+// ✅ Correct
+const MAX_CONCURRENT_SESSIONS = 5
+const INVITE_TOKEN_LENGTH_BYTES = 32
+const INACTIVITY_TIMEOUT_MS = 2 * 60 * 60 * 1000 // 2 hours
+
+if (sessions.length > MAX_CONCURRENT_SESSIONS) { ... }
+const token = crypto.randomBytes(INVITE_TOKEN_LENGTH_BYTES).toString('hex')
+setTimeout(callback, INACTIVITY_TIMEOUT_MS)
+```
+
+### Define constants close to where they're used
+
+- Route-level constants: in the route file
+- Shared system constants: in `src/lib/constants.ts`
+- Database-related constants (enum values, defaults): in `src/db/constants.ts`
+
+### Environment variables are never read inline
+
+Always read environment variables through a validated config module. Never access `process.env` or `Bun.env` directly in application logic.
+
+```ts
+// ❌ Wrong — brittle, unvalidated, can silently be undefined
+const dbUrl = process.env.DATABASE_URL
+
+// ✅ Correct — validated at startup, typed, throws early if missing
+import { config } from '$lib/config'
+const dbUrl = config.database.url
+```
+
+Create `src/lib/config.ts` that reads all env vars at startup, validates they are present and correctly typed, and exports a typed config object. If any required variable is missing, the application fails to start with a clear error message.
+
+---
+
+## Comments
+
+### Write comments for *why*, not *what*
+
+The code already explains what it does. Comments explain reasoning, context, and tradeoffs that are not obvious from reading the code.
+
+```ts
+// ❌ Wrong — explains what, which the code already shows
+// Loop through assets and mark them as verified
+for (const asset of assets) {
+  asset.verificationStatus = 'verified'
+}
+
+// ✅ Correct — explains why
+// Assets are marked verified in bulk here rather than individually
+// because the verification campaign creates a single audit log entry
+// for the entire batch (per COA requirements for group verifications).
+for (const asset of assets) {
+  asset.verificationStatus = 'verified'
+}
+```
+
+### Document non-obvious decisions
+
+```ts
+// We use Bun.randomUUIDv7() via the generateId() wrapper in src/db/utils/id.ts
+// rather than importing directly from 'bun' in schema files, because drizzle-kit
+// runs schema analysis in a Node.js subprocess and cannot resolve the 'bun' module.
+// See: https://github.com/drizzle-team/drizzle-orm/issues/4469
+```
+
+### No TODO comments without a linked issue
+
+```ts
+// ❌ Wrong — TODO with no context
+// TODO: add rate limiting here
+
+// ✅ Correct — TODO with issue reference and description
+// TODO(#145): Add per-endpoint rate limiting. Currently using global rate limit
+// middleware. Per-endpoint limits require the Redis rate limit store to be
+// configured, which is done in Phase 9.
+```
+
+### No commented-out code
+
+Delete it. Git has history. If you need it back, `git log` is your tool.
+
+```ts
+// ❌ Wrong
+// const oldQuery = db.query.assets.findMany({ where: ... })
+const assets = await db.query.assets.findMany({ where: eq(assets.departmentId, id) })
+```
+
+---
+
+## Validation
+
+### Never use Valibot or Zod
+
+This project uses **TypeBox / `Elysia.t`** exclusively. Valibot and Zod are not installed and must not be added.
+
+```ts
+// ❌ Wrong
+import { z } from 'zod'
+import { v, object, string } from 'valibot'
+
+// ✅ Correct
+import { t } from 'elysia'
+import { createInsertSchema } from 'drizzle-typebox'
+```
+
+### Never trust client input
+
+All input that arrives from a client (request body, query params, path params, headers, cookies) must be validated before use. TypeBox validation via Elysia handles this automatically in route definitions — but business logic validation (Step 2) is always written explicitly in the handler.
+
+### Never validate only on the client
+
+Client-side form validation is for UX only. Server-side TypeBox validation is the enforcing layer. Both must exist.
+
+---
+
+## Database
+
+### Never import `randomUUIDv7` from `'bun'` directly in schema files
+
+Always use the wrapper:
+
+```ts
+// ❌ Wrong in schema files — breaks drizzle-kit
+import { randomUUIDv7 } from 'bun'
+
+// ✅ Correct — import from the utility wrapper
+import { generateId } from '$db/utils/id'
+```
+
+### Soft deletes only for important records
+
+Government records are never hard-deleted. All tables with important data use `deleted_at`:
+
+```ts
+// ❌ Wrong
+await db.delete(assets).where(eq(assets.id, id))
+
+// ✅ Correct
+await db.update(assets)
+  .set({ deletedAt: new Date() })
+  .where(eq(assets.id, id))
+```
+
+### Always filter soft-deleted records
+
+Any query that returns records to the user must filter out soft-deleted rows:
+
+```ts
+// ❌ Wrong — returns deleted assets
+const allAssets = await db.query.assets.findMany()
+
+// ✅ Correct
+const activeAssets = await db.query.assets.findMany({
+  where: isNull(assets.deletedAt)
+})
+```
+
+### No raw SQL unless Drizzle cannot express it
+
+Use Drizzle's query builder. Fall back to `sql` tagged template only when Drizzle's API cannot express the query, and document why.
+
+---
+
+## API and Routing
+
+### All routes are versioned
+
+Every Elysia route must be under `/api/v1/`. There are no unversioned routes.
+
+### Never return raw database rows directly
+
+Always select only the fields the client needs. Never expose internal columns like `deletedAt`, internal flags, or password hashes.
+
+```ts
+// ❌ Wrong — leaks internal fields
+return await db.query.users.findFirst({ where: eq(users.id, id) })
+
+// ✅ Correct — select only what the client needs
+return await db.query.users.findFirst({
+  where: eq(users.id, id),
+  columns: {
+    id: true,
+    email: true,
+    name: true,
+    departmentId: true,
+    role: true,
+    createdAt: true,
+  }
+})
+```
+
+### Auth and RBAC checks always come first in handlers
+
+```ts
+// ✅ Correct order in a handler
+async ({ body, store, error }) => {
+  // 1. Auth check (via middleware, but verify session is present)
+  if (!store.session) return error(401, { message: 'Unauthorized' })
+
+  // 2. RBAC check
+  if (!hasPermission(store.session.user.role, 'asset:create')) {
+    return error(403, { message: 'Insufficient permissions' })
+  }
+
+  // 3. Business logic validation (Step 2)
+  const dept = await db.query.departments.findFirst(...)
+  if (!dept) return error(404, { message: 'Department not found' })
+
+  // 4. The actual work
+  const asset = await insertAsset(body)
+  return asset
+}
+```
+
+### Consistent error response shape
+
+All errors must return this shape:
+
+```ts
+return error(statusCode, {
+  message: 'Human-readable description',
+  code: 'MACHINE_READABLE_CODE',   // optional but preferred
+  field: 'fieldName',              // optional, for field-specific errors
+})
+```
+
+---
+
+## Frontend (SvelteKit)
+
+### All API calls go through Eden Treaty
+
+Never write manual `fetch` calls to the Elysia API. Always use the Eden Treaty client:
+
+```ts
+// ❌ Wrong
+const res = await fetch('/api/v1/assets', { method: 'GET' })
+const data = await res.json()
+
+// ✅ Correct
+import { api } from '$lib/api'
+const { data, error } = await api.v1.assets.get()
+```
+
+### Store setup at the right level
+
+- Component-local state: Svelte `$state()` rune
+- Shared app state: Svelte stores in `src/lib/stores/`
+- Server data: SvelteKit `load()` functions, not client-side fetches for initial data
+
+### Forms use Superforms
+
+All forms use SvelteKit Superforms with TypeBox schemas. Never build forms with manual event handlers and raw state management.
+
+### No inline styles
+
+Use Tailwind utility classes. No `style=""` attributes on elements unless there is a computed dynamic value that Tailwind cannot express.
+
+---
+
+## Security
+
+### No secrets in code
+
+Never hardcode API keys, tokens, passwords, or secrets in source files. Always use environment variables read through the config module.
+
+### Sanitize before display
+
+When displaying user-supplied content in the UI, ensure Svelte's default HTML escaping is not bypassed. Never use `{@html userContent}` unless the content has been explicitly sanitized and this is documented.
+
+### Audit log for every state-changing operation
+
+Every action that modifies government data must write to the audit log. This is not optional and not a "nice to have":
+
+```ts
+// After any successful write to the database for important entities:
+await writeAuditLog({
+  action: 'asset.updated',
+  entityType: 'asset',
+  entityId: asset.id,
+  actorUserId: session.user.id,
+  actorIp: request.headers.get('x-forwarded-for') ?? 'unknown',
+  beforeValue: originalAsset,
+  afterValue: updatedAsset,
+})
+```
+
+---
+
+## General Rules That Apply Everywhere
+
+1. **Readability over cleverness.** If a future developer (or AI agent) cannot immediately understand what a piece of code does, it needs to be rewritten, not documented around.
+
+2. **No dead code.** Features that are removed should have their code removed. Unused exports, unused functions, and unused components must be deleted.
+
+3. **No global state mutations outside of stores.** Do not reach into application state from deep inside a component tree or an API handler.
+
+4. **Consistency over personal preference.** Follow the patterns already established in the codebase even if you would personally do it differently. Consistency makes the codebase predictable.
+
+5. **When in doubt, look at how it's done elsewhere in the project.** The existing code is the style guide.

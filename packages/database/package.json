@@ -5,15 +5,24 @@
     "db:migrate": "bunx drizzle-kit migrate",
     "db:check": "bunx drizzle-kit check"
   },
+  "exports": {
+    "./models": "./src/models/*",
+    "./utils": "./src/utils.ts",
+    "./schemas": "./src/schemas/index.ts",
+    "./db": "./src/db.ts",
+    "./node/db": "./src/node-db.ts"
+  },
   "dependencies": {
     "@sinclair/typebox": "0.34.0",
-    "drizzle-orm": "0.45.2",
-    "drizzle-typebox": "^0.3.3"
+    "drizzle-orm": "^0.45.2",
+    "drizzle-typebox": "^0.3.3",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
+    "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.31.10"
   },
   "overrides": {
-  	"@sinclair/typebox": "0.34.0"
+    "@sinclair/typebox": "0.34.0"
   }
 }

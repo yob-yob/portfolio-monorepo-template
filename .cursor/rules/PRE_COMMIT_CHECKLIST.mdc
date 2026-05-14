@@ -1,0 +1,300 @@
+# PRE-COMMIT CHECKLIST
+
+> This checklist must be completed before every commit, without exception.
+> It applies to human developers and AI agents equally.
+> If any item fails, the commit does not happen until it is fixed.
+
+---
+
+## Why a Checklist
+
+This is a government system. A broken commit on `main` does not just inconvenience a developer — it can corrupt records, expose vulnerabilities, or make the system unavailable to LGU staff who rely on it for their official duties. The cost of five minutes spent on a checklist is far lower than the cost of a bad deployment.
+
+This checklist also exists because AI agents tend to skip verification steps when they are not explicitly required. This document makes those steps explicit and mandatory.
+
+---
+
+## The Mandatory Pre-Commit Sequence
+
+Run these commands in this exact order before every commit. All must pass with zero errors.
+
+### Step 1 — Format, Lint, and Type-Check
+
+```bash
+vp check
+```
+
+This single command runs:
+- **Oxfmt** — enforces consistent code formatting (Prettier-compatible)
+- **Oxlint** — enforces 600+ code quality rules (ESLint-compatible)
+- **tsgolint** — enforces TypeScript type correctness (powered by TypeScript Go toolchain)
+
+**Expected output when clean:**
+
+```
+pass: All N files are correctly formatted (Xms, 16 threads)
+pass: Found no warnings, lint errors, or type errors in N files (Xms, 16 threads)
+```
+
+**What to do if it fails:**
+
+```bash
+# Try auto-fixing first
+vp check --fix
+
+# Then re-run to confirm
+vp check
+
+# If errors remain after --fix, they require manual resolution
+# Read the error output carefully — it tells you exactly what file and line
+```
+
+Do not proceed to Step 2 until `vp check` passes cleanly.
+
+### Step 2 — Run All Tests
+
+```bash
+vp test
+```
+
+This runs the full Vitest test suite, including:
+- Unit tests for TypeBox schemas and utility functions
+- Integration tests for Elysia API endpoints
+- RBAC permission enforcement tests
+- Database query tests
+- Auth flow tests
+
+**Expected output when clean:**
+
+```
+✓ N tests passed in Xms
+```
+
+**What to do if it fails:**
+
+1. Read the failure output — Vitest tells you exactly which test failed and why
+2. Fix the root cause in the source code (do not modify the test to make it pass unless the test itself is wrong)
+3. Re-run `vp test` until all tests pass
+4. Do not comment out failing tests — fix them
+
+Do not proceed to Step 3 until `vp test` passes cleanly.
+
+### Step 3 — Review the Diff
+
+```bash
+git diff --staged
+```
+
+Before committing, read through every line of the staged changes. Ask yourself:
+
+- [ ] Does this diff contain only what this commit is supposed to change?
+- [ ] Are there any accidental changes (wrong files, extra whitespace, unrelated edits)?
+- [ ] Are there any `console.log`, `debugger`, or debugging artifacts still in the code?
+- [ ] Are there any hardcoded secrets, tokens, or passwords?
+- [ ] Are there any commented-out code blocks that should be deleted?
+- [ ] Are there any `.env` files or secret files accidentally staged?
+
+If anything looks wrong, unstage and fix it before committing.
+
+### Step 4 — Commit
+
+```bash
+git add <specific files>   # Stage only what belongs in this commit
+git commit -m "type(scope): description"
+```
+
+Do not use `git add .` or `git add -A` unless you have reviewed every changed file with `git status` and confirmed all of them belong in this commit.
+
+---
+
+## Quick Reference Card
+
+Print this or keep it visible during development:
+
+```
+┌─────────────────────────────────────────────┐
+│         PRE-COMMIT SEQUENCE                 │
+├─────────────────────────────────────────────┤
+│  1. vp check          → must pass           │
+│  2. vp test           → must pass           │
+│  3. git diff --staged → review manually     │
+│  4. git add <files>   → stage only what     │
+│                          belongs here       │
+│  5. git commit -m "…" → follow convention   │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+## Detailed Checklist
+
+Use this full checklist for larger or riskier changes.
+
+### Code Quality
+- [ ] `vp check` passes with zero errors and zero warnings
+- [ ] `vp check --fix` was run if there were auto-fixable issues
+- [ ] No `any` types introduced without an accompanying explanation comment
+- [ ] No `@ts-ignore` or `@ts-expect-error` without an explanation comment
+- [ ] No `console.log`, `console.debug`, or debugging statements left in
+- [ ] No commented-out code blocks
+- [ ] No hardcoded secrets, API keys, or credentials
+
+### Tests
+- [ ] `vp test` passes with zero failures
+- [ ] New features have corresponding tests in the same commit
+- [ ] Bug fixes have a corresponding regression test in the same commit
+- [ ] No tests were skipped or commented out to make the suite pass
+
+### Database (if this commit touches `src/db/`)
+- [ ] All new tables use `generateId()` from `$db/utils/id` for the primary key (not `randomUUIDv7` imported directly from `'bun'`)
+- [ ] All new tables have `created_at` and `updated_at` columns
+- [ ] Tables with soft-deletable records have a `deleted_at` column
+- [ ] A Drizzle migration has been generated for schema changes (`vp run db:migrate` or `drizzle-kit generate`)
+- [ ] The migration file has been reviewed and looks correct
+- [ ] TypeBox schemas have been created or updated in `src/db/typebox/` for any modified tables
+- [ ] The `@sinclair/typebox` version pin in `package.json` is still correct
+
+### API (if this commit touches `src/api/`)
+- [ ] The route is under `/api/v1/`
+- [ ] The route has auth middleware applied
+- [ ] The route has RBAC permission check applied
+- [ ] The route has a TypeBox schema for `body`, `query`, and/or `params` as appropriate
+- [ ] The route has a Swagger tag assigned (for OpenAPI documentation)
+- [ ] Step 2 business logic validation is implemented for all cross-reference checks
+- [ ] Errors use the standard error response shape `{ message, code?, field? }`
+- [ ] The audit log is written for any state-changing operation
+
+### UI / SvelteKit (if this commit touches `src/routes/` or `src/lib/components/`)
+- [ ] API calls use Eden Treaty, not raw `fetch`
+- [ ] Forms use Superforms with a TypeBox schema
+- [ ] All form states are handled: idle, loading, success, validation error, server error, network error
+- [ ] No inline `style=""` attributes (use Tailwind classes)
+- [ ] No `{@html ...}` with unsanitized user content
+- [ ] No relative `../` import chains — all imports use path aliases
+
+### Auth and Security
+- [ ] No new endpoint is missing auth middleware
+- [ ] No new endpoint is missing RBAC permission check
+- [ ] No environment variables are read inline with `process.env` or `Bun.env` — use the config module
+- [ ] No secrets or API keys in staged files
+- [ ] `.env` files are not staged (must be in `.gitignore`)
+
+### Commit Message
+- [ ] Message follows Conventional Commits format: `type(scope): description`
+- [ ] Type is one of: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `style`, `ci`, `perf`
+- [ ] Description is in imperative mood ("add", "fix", "remove" — not "added", "fixing")
+- [ ] Description is specific enough to understand without opening the diff
+- [ ] Subject line is 72 characters or fewer
+- [ ] No period at the end of the subject line
+- [ ] This commit contains only one logical unit of change
+
+---
+
+## Scenarios and How to Handle Them
+
+### "I wrote a lot and want to commit it all at once"
+
+Do not. Break your work into the individual logical units it represents and commit them separately. Use `git add -p` (patch mode) to stage individual hunks if multiple changes are in the same file.
+
+```bash
+git add -p src/api/assets/index.ts   # Stage only specific changes in a file
+```
+
+### "The tests are flaky and sometimes fail for unrelated reasons"
+
+Fix the flaky tests before committing. A flaky test is a broken test. If a test fails intermittently, it cannot be trusted, and it means there is a real problem with either the test or the system under test.
+
+### "`vp check` fails on a file I didn't touch"
+
+This means the codebase already had a lint or type error before your change. Fix it in a separate preceding commit (`fix: resolve pre-existing lint error in ...`), then make your change commit.
+
+### "I need to commit just to save my work"
+
+Use a feature branch. You can commit broken work on a feature branch, but it must be cleaned up (squashed or amended) before the branch is merged. Never push broken commits to `develop` or `main`.
+
+```bash
+git checkout -b feature/my-work
+git commit -m "wip: asset create form (do not merge)"  # acceptable on a feature branch
+# ... continue working ...
+git commit --amend   # fix the WIP commit before merging
+```
+
+### "An AI agent produced a large batch of code and wants to commit it all"
+
+The AI agent must split its output into individual commits per the commit discipline rules. If the agent cannot run `vp check` and `vp test`, the human developer must run them before committing the agent's output.
+
+### "A test is failing because of something I didn't change"
+
+This is a regression introduced by a previous commit. Fix the regression before committing your new work. Do not commit on top of a broken test suite.
+
+---
+
+## Automating the Checklist with a Git Hook
+
+To run `vp check` and `vp test` automatically before every `git commit`:
+
+Create `.git/hooks/pre-commit`:
+
+```bash
+#!/bin/sh
+
+echo "Running pre-commit checks..."
+
+# Step 1: vp check
+vp check
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ vp check failed. Fix the errors above before committing."
+  exit 1
+fi
+
+# Step 2: vp test
+vp test
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "❌ vp test failed. Fix the failing tests before committing."
+  exit 1
+fi
+
+echo ""
+echo "✅ Pre-commit checks passed."
+```
+
+Make it executable:
+
+```bash
+chmod +x .git/hooks/pre-commit
+```
+
+With this hook in place, `git commit` will automatically run both checks and abort if either fails.
+
+**Note:** Git hooks are local and not committed to the repository. Each developer must set them up manually. Document this in the project README's "Development Setup" section.
+
+---
+
+## What the CI Pipeline Also Checks
+
+Even if you skip the pre-commit checks locally, the GitLab CI pipeline will catch errors:
+
+```yaml
+check:
+  script: vp check   # Fails the pipeline if check fails
+
+test:
+  script: vp test    # Fails the pipeline if tests fail
+```
+
+A failed pipeline blocks merge into `develop` or `main`. The pre-commit checklist exists so that you catch these failures locally in seconds rather than waiting for the pipeline.
+
+---
+
+## Summary
+
+| Checkpoint | Command | Must Pass? |
+|---|---|---|
+| Format + Lint + TypeCheck | `vp check` | ✅ Yes, always |
+| All Tests | `vp test` | ✅ Yes, always |
+| Diff Review | `git diff --staged` | ✅ Yes, manually |
+| Commit Message Format | Conventional Commits | ✅ Yes, always |
+| Single Logical Unit | Manual review | ✅ Yes, always |
+| No secrets staged | `git status` + review | ✅ Yes, always |
