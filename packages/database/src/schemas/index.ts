@@ -1,5 +1,1 @@
-import * as auth from "./auth.ts"
-
-export {
-  auth
-}
+export * as auth from "./auth.ts";

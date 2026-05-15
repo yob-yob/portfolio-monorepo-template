@@ -1,14 +1,14 @@
 {
   "name": "@asset-tracking/auth",
+  "exports": {
+    "./server": "./src/auth.ts",
+    "./client": "./src/auth-client.ts"
+  },
   "scripts": {
     "schema:generate": "bun x auth@latest generate --config ./src/auth.ts --output=../database/src/schemas/auth.ts"
   },
   "dependencies": {
-    "better-auth": "^1.6.11",
-    "@asset-tracking/database": "workspace:*"
-  },
-  "exports": {
-    "./server" : "./src/auth.ts",
-    "./client" : "./src/auth-client.ts"
+    "@asset-tracking/database": "workspace:*",
+    "better-auth": "^1.6.11"
   }
 }

@@ -1,12 +1,11 @@
 {
-	"extends": [
-		"../../tsconfig.json",
-	],
-	"compilerOptions": {
-   	"lib": ["ESNext", "DOM"],
+  "extends": ["../../tsconfig.json"],
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM"],
     "paths": {
-        "@/backend/*": ["../../apps/backend/src/*"],
-        "@/api-client/*": ["./src/*"]
-    }
-	}
+      "@/backend/*": ["../../apps/backend/src/*"],
+      "@/api-client/*": ["./src/*"]
+    },
+    "strictNullChecks": true
+  }
 }

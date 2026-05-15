@@ -28,10 +28,9 @@ export type SelectUser = typeof users.$inferSelect;
 export type InsertPost = typeof posts.$inferInsert;
 export type SelectPost = typeof posts.$inferSelect;
 
-
 export const table = {
   users,
-  posts
-} as const
+  posts,
+} as const;
 
-export type Table = typeof table
+export type Table = typeof table;
