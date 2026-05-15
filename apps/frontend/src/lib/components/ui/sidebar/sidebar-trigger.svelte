@@ -3,7 +3,7 @@
   import type { ComponentProps } from "svelte";
   import { Button } from "$lib/components/ui/button/index.js";
   import { cn } from "$lib/utils.js";
-  import { useSidebar } from "./context.svelte.js.ts";
+  import { useSidebar } from "./context.svelte.ts";
 
   let {
     ref = $bindable(null),

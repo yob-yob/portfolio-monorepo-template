@@ -1,5 +1,5 @@
 import { db } from "@asset-tracking/database/db";
-import { auth } from "@asset-tracking/database/schemas";
+import { users } from "@asset-tracking/database/schemas/auth";
 import { Elysia } from "elysia";
 
 export const apiV1 = new Elysia({
@@ -8,13 +8,13 @@ export const apiV1 = new Elysia({
   .get("/", "Hello Elysia")
   .get("/health", async ({ status }) => {
     // test db
-    const users = await db
-      .select({ created_at: auth.users.createdAt })
-      .from(auth.users)
+    const usersData = await db
+      .select({ created_at: users.createdAt })
+      .from(users)
       .limit(1);
 
     return status(200, {
       ok: true,
-      users,
+      usersData,
     });
   });

@@ -1,0 +1,11 @@
+{
+  "extends": ["../../tsconfig.json"],
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "paths": {
+      "@/backend/*": ["../../apps/backend/src/*"],
+      "@/database/*": ["../../packages/database/src/*"]
+    },
+    "strictNullChecks": true
+  }
+}

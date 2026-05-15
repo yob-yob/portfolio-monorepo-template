@@ -1,5 +1,10 @@
 import { db } from "@asset-tracking/database/node/db";
-import { auth } from "@asset-tracking/database/schemas";
+import {
+  accounts,
+  sessions,
+  users,
+  verifications,
+} from "@asset-tracking/database/schemas/auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 
@@ -10,7 +15,12 @@ if (!process.env.BETTER_AUTH_SECRET) {
 export default betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
-    schema: auth,
+    schema: {
+      accounts,
+      sessions,
+      users,
+      verifications,
+    },
     usePlural: true,
   }),
   baseURL: "http://localhost:3000/",

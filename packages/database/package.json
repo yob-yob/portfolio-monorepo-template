@@ -1,9 +1,7 @@
 {
   "name": "@asset-tracking/database",
   "exports": {
-    "./models": "./src/models/*",
-    "./utils": "./src/utils.ts",
-    "./schemas": "./src/schemas/index.ts",
+    "./schemas/*": "./src/schemas/*.ts",
     "./db": "./src/db.ts",
     "./node/db": "./src/node-db.ts"
   },

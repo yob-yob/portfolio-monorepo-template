@@ -12,7 +12,8 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
   },
   "dependencies": {
-    "@sveltejs/adapter-static": "^3.0.10"
+    "@sveltejs/adapter-static": "^3.0.10",
+    "mode-watcher": "^1.1.0"
   },
   "devDependencies": {
     "@asset-tracking/api-client": "workspace:*",
