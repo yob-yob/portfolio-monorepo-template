@@ -2,7 +2,7 @@
   "extends": "//",
   "overrides": [
     {
-      "includes": ["**/*.svelte", "**/*.astro", "**/*.vue"],
+      "includes": ["**/*.svelte"],
       "linter": {
         "rules": {
           "style": {
@@ -12,10 +12,41 @@
           },
           "correctness": {
             "noUnusedVariables": "off",
-            "noUnusedImports": "off"
+            "noUnusedImports": "off",
+            "noUnusedFunctionParameters": "off"
+          },
+          "performance": {
+            "noNamespaceImport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "src/lib/components/ui/**/*.svelte",
+        "src/lib/components/ui/**/*.ts"
+      ],
+      "linter": {
+        "rules": {
+          "nursery": {
+            "useSortedClasses": "off"
+          },
+          "style": {
+            "noExportedImports": "off"
+          },
+          "complexity": {
+            "noCommaOperator": "off"
+          },
+          "suspicious": {
+            "noAssignInExpressions": "off"
           }
         }
       }
     }
-  ]
+  ],
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
 }

@@ -1,0 +1,23 @@
+---
+description: Only apply code/config fixes when the user explicitly requests fixing or implementation.
+alwaysApply: true
+---
+
+# Explicit fix and implementation requests
+
+The maintainer wants to **understand and own** changes in this system. The agent must respect that workflow.
+
+## Default behavior
+
+- For errors, warnings, or "what does this mean?" questions: **explain** the cause, impact, and **options** (including trade-offs). Do **not** edit files, run auto-fixers that change the codebase, or apply patches **unless** the user clearly asks for that.
+- Phrases that count as explicit permission to change the repo include: **fix it**, **apply the fix**, **implement that**, **go ahead and change**, **update the code**, **patch `vite.config`**, etc. Generic questions ("is there an alternative?", "what should I do?") are **not** permission to modify the repo.
+
+## When suggesting a fix
+
+- Describe what would change and where; the user applies it or asks the agent to do it.
+- If the user previously asked for explanation-only, do not treat a new message as implicit permission unless they shift to an explicit implement/fix request.
+
+## Exceptions
+
+- **User rules** in Cursor that still require certain behaviors (e.g. run commands the user asked for) take precedence where they conflict.
+- If the user attaches a rule that says "make this change," that is explicit enough.

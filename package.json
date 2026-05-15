@@ -7,8 +7,7 @@
     "dev": "bun run --parallel --workspaces --if-present dev",
     "build": "bun run --sequential --workspaces --if-present build",
     "lint:check": "ultracite check",
-    "lint:fix": "ultracite fix",
-    "prepare": "husky"
+    "lint:fix": "ultracite fix"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
@@ -30,7 +29,7 @@
   ],
 
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,jsonc,css,scss,md,mdx}": [
+    "*.{ts,json,css,md}": [
       "bun x ultracite fix"
     ]
   }
