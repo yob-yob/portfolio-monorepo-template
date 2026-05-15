@@ -2,7 +2,7 @@ import { openapi } from "@elysia/openapi";
 import staticPlugin from "@elysia/static";
 import { Elysia } from "elysia";
 
-import { apiV1 } from "./api/v1";
+import { apiV1 } from "./api/v1.ts";
 
 // Initializing the APP
 export const app = new Elysia()

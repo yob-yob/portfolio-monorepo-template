@@ -7,8 +7,8 @@
     SIDEBAR_COOKIE_NAME,
     SIDEBAR_WIDTH,
     SIDEBAR_WIDTH_ICON,
-  } from "./constants.js";
-  import { setSidebar } from "./context.svelte.js";
+  } from "./constants.ts";
+  import { setSidebar } from "./context.svelte.js.ts";
 
   let {
     ref = $bindable(null),

@@ -1,5 +1,12 @@
 {
   "extends": "//",
+  "linter": {
+    "rules": {
+      "correctness": {
+        "noUnresolvedImports": "off"
+      }
+    }
+  },
   "overrides": [
     {
       "includes": ["**/*.svelte"],
