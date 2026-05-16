@@ -11,7 +11,9 @@
     "db:check": "bun run drizzle-kit check"
   },
   "dependencies": {
+    "@paralleldrive/cuid2": "^3.3.0",
     "drizzle-orm": "^0.45.2",
+    "drizzle-seed": "^0.3.1",
     "drizzle-typebox": "^0.3.3",
     "pg": "^8.20.0"
   },

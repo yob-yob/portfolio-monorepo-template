@@ -1,15 +1,46 @@
 <script lang="ts">
-  import DarkModeToggle from "$lib/components/dark-mode-toggle.svelte";
-  import LoginForm from "$lib/components/login-form.svelte";
+  import AppSidebar from "$lib/components/app-sidebar.svelte";
+  import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
+  import { Separator } from "$lib/components/ui/separator/index.js";
+  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 </script>
 
-<div
-  class="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10"
->
-  <div class="absolute top-4 right-4">
-    <DarkModeToggle />
-  </div>
-  <div class="w-full max-w-sm md:max-w-3xl">
-    <LoginForm />
-  </div>
-</div>
+<Sidebar.Provider>
+  <AppSidebar />
+  <Sidebar.Inset>
+    <header
+      class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12"
+    >
+      <div class="flex items-center gap-2 px-4">
+        <Sidebar.Trigger class="-ms-1" />
+        <Separator
+          orientation="vertical"
+          class="me-2 data-[orientation=vertical]:h-4"
+        />
+        <Breadcrumb.Root>
+          <Breadcrumb.List>
+            <Breadcrumb.Item class="hidden md:block">
+              <Breadcrumb.Link href="##"
+                >Build Your Application</Breadcrumb.Link
+              >
+            </Breadcrumb.Item>
+            <Breadcrumb.Separator class="hidden md:block" />
+            <Breadcrumb.Item>
+              <Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
+            </Breadcrumb.Item>
+          </Breadcrumb.List>
+        </Breadcrumb.Root>
+      </div>
+    </header>
+    <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div class="grid auto-rows-min gap-4 md:grid-cols-3">
+        <div class="bg-muted/50 aspect-video rounded-xl"></div>
+        <div class="bg-muted/50 aspect-video rounded-xl"></div>
+        <div class="bg-muted/50 aspect-video rounded-xl"></div>
+      </div>
+      <div
+        class="bg-muted/50 min-h-screen flex-1 rounded-xl md:min-h-min"
+      ></div>
+    </div>
+  </Sidebar.Inset>
+</Sidebar.Provider>

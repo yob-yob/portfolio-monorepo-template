@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { authClient } from "@asset-tracking/auth/client";
+  import { api } from "@asset-tracking/api-client";
   import type { HTMLAttributes } from "svelte/elements";
   import loginBanner from "$lib/assets/login-banner.png";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -27,14 +27,18 @@
     errorMessage = undefined;
     isLoading = true;
     const formData = new FormData(event.target as HTMLFormElement);
+    const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const { error } = await authClient.signIn.email({ email, password });
-
+    const confirmPassword = formData.get("confirmPassword") as string;
+    const { error } = await api.api.v1.onboarding.post({
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
     if (error) {
-      errorMessage = error.message ?? "An unknown error occurred";
-    } else {
-      console.log("Login successful");
+      errorMessage = error.value.message ?? "An unknown error occurred";
     }
     isLoading = false;
   };
@@ -46,11 +50,21 @@
       <form class="p-6 md:p-8" onsubmit={handleSubmit}>
         <FieldGroup>
           <div class="flex flex-col items-center gap-2 text-center">
-            <h1 class="text-2xl font-bold">Welcome back</h1>
+            <h1 class="text-2xl font-bold">Admin On Boarding</h1>
             <p class="text-muted-foreground text-balance">
-              Login to Asset Tracking System
+              Complete your onboarding to start using the asset tracking system
             </p>
           </div>
+          <Field>
+            <FieldLabel for="name-{id}">Name</FieldLabel>
+            <Input
+              id="name-{id}"
+              type="text"
+              name="name"
+              placeholder="John Doe"
+              required
+            />
+          </Field>
           <Field>
             <FieldLabel for="email-{id}">Email</FieldLabel>
             <Input
@@ -62,19 +76,20 @@
             />
           </Field>
           <Field>
-            <div class="flex items-center">
-              <FieldLabel for="password-{id}">Password</FieldLabel>
-              <a
-                href="##"
-                class="ms-auto text-sm underline-offset-2 hover:underline"
-              >
-                Forgot your password?
-              </a>
-            </div>
+            <FieldLabel for="password-{id}">Password</FieldLabel>
             <Input
               id="password-{id}"
               type="password"
               name="password"
+              required
+            />
+          </Field>
+          <Field>
+            <FieldLabel for="confirmPassword-{id}">Confirm Password</FieldLabel>
+            <Input
+              id="confirmPassword-{id}"
+              type="password"
+              name="confirmPassword"
               required
             />
           </Field>

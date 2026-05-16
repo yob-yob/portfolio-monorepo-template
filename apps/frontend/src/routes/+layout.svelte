@@ -2,12 +2,18 @@
   import "./layout.css";
   import { authClient } from "@asset-tracking/auth/client";
   import { ModeWatcher } from "mode-watcher";
+  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
   import favicon from "$lib/assets/favicon.svg";
-  import LoginForm from "$lib/components/login-form.svelte";
 
   const { children } = $props();
 
-  const session = authClient.useSession();
+  onMount(async () => {
+    const session = await authClient.getSession();
+    if (!session) {
+      goto("/auth/login");
+    }
+  });
 </script>
 
 <svelte:head>
@@ -16,8 +22,4 @@
 
 <ModeWatcher />
 
-{#if session.get()}
-  {@render children()}
-{:else}
-  <LoginForm />
-{/if}
+{@render children()}
