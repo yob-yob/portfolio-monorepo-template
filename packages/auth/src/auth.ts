@@ -23,7 +23,10 @@ export default betterAuth({
     },
     usePlural: true,
   }),
-  baseURL: "http://localhost:3000/",
+  baseURL: {
+    allowedHosts: ["localhost:*"],
+    fallback: "localhost:3000",
+  },
   emailAndPassword: { enabled: true },
   secret: process.env.BETTER_AUTH_SECRET,
 });

@@ -12,12 +12,13 @@
     "lint:fix": "eslint --fix"
   },
   "dependencies": {
+    "@asset-tracking/database": "workspace:*",
+    "@asset-tracking/auth": "workspace:*",
     "@elysia/openapi": "^1.4.15",
     "@elysia/static": "^1.4.11",
     "elysia": "latest"
   },
   "devDependencies": {
-    "@asset-tracking/database": "workspace:*",
     "@types/bun": "^1.3.14"
   }
 }
