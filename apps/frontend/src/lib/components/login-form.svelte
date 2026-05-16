@@ -48,6 +48,7 @@
             <Input
               id="email-{id}"
               type="email"
+              name="email"
               placeholder="m@example.com"
               required
             />
@@ -62,7 +63,12 @@
                 Forgot your password?
               </a>
             </div>
-            <Input id="password-{id}" type="password" required />
+            <Input
+              id="password-{id}"
+              type="password"
+              name="password"
+              required
+            />
           </Field>
           <Field>
             <Button type="submit">Login</Button>
