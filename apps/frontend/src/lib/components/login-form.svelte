@@ -7,6 +7,7 @@
   import {
     Field,
     FieldDescription,
+    FieldError,
     FieldGroup,
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
@@ -18,17 +19,24 @@
 
   const id = $props.id();
 
+  let errorMessage = $state<string | undefined>(undefined);
+  let isLoading = $state<boolean>(false);
+
   const handleSubmit = async (event: Event) => {
     event.preventDefault();
+    errorMessage = undefined;
+    isLoading = true;
     const formData = new FormData(event.target as HTMLFormElement);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const { error } = await authClient.signIn.email({ email, password });
+
     if (error) {
-      console.error(error);
+      errorMessage = error.message ?? "An unknown error occurred";
     } else {
       console.log("Login successful");
     }
+    isLoading = false;
   };
 </script>
 
@@ -71,7 +79,16 @@
             />
           </Field>
           <Field>
-            <Button type="submit">Login</Button>
+            <Button type="submit" class="cursor-pointer" disabled={isLoading}>
+              Login
+            </Button>
+            <FieldError>
+              {#if errorMessage}
+                {errorMessage}
+              {:else}
+                &nbsp;
+              {/if}
+            </FieldError>
           </Field>
         </FieldGroup>
       </form>
