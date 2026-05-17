@@ -1,17 +1,6 @@
 <script lang="ts">
-  import { authClient } from "@asset-tracking/auth/client";
-  import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
   import DarkModeToggle from "$lib/components/dark-mode-toggle.svelte";
   import ForgotPasswordForm from "$lib/components/forms/forgot-password-form.svelte";
-
-  onMount(async () => {
-    const auth = await authClient.getSession();
-
-    if (auth) {
-      goto("/");
-    }
-  });
 </script>
 
 <div

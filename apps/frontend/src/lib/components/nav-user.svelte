@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { authClient } from "@asset-tracking/auth/client";
   import BadgeCheckIcon from "@lucide/svelte/icons/badge-check";
   import BellIcon from "@lucide/svelte/icons/bell";
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
@@ -78,7 +79,7 @@
           </DropdownMenu.Item>
         </DropdownMenu.Group>
         <DropdownMenu.Separator />
-        <DropdownMenu.Item>
+        <DropdownMenu.Item onSelect={() => authClient.signOut()}>
           <LogOutIcon />
           Log out
         </DropdownMenu.Item>

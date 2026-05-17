@@ -1,18 +1,11 @@
 <script lang="ts">
   import { api } from "@asset-tracking/api-client";
-  import { authClient } from "@asset-tracking/auth/client";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import DarkModeToggle from "$lib/components/dark-mode-toggle.svelte";
   import LoginForm from "$lib/components/forms/login-form.svelte";
 
   onMount(async () => {
-    const auth = await authClient.getSession();
-
-    if (auth) {
-      goto("/");
-    }
-
     // Should On-Board
     const { data, error } = await api.api.v1.onboarding.get();
 

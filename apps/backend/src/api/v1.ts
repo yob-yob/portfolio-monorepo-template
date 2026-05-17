@@ -5,6 +5,7 @@ import { Elysia, status, t } from "elysia";
 
 export const apiV1 = new Elysia({
   prefix: "/api/v1",
+  tags: ["API v1"],
 })
   .get("/", "Hello Elysia")
   .get("/health", async ({ status }) => {
