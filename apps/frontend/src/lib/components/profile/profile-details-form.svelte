@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { api } from "@asset-tracking/api-client";
   import CameraIcon from "@lucide/svelte/icons/camera";
   import { authClient } from "@/auth/client";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
@@ -14,7 +15,7 @@
 
   const id = $props.id();
 
-  let { user }: { user: { name: string; image?: string } } = $props();
+  let { user }: { user: { name: string; image?: string | null } } = $props();
 
   let name = $derived(user.name);
   let avatarPreview = $derived(user.image);
@@ -24,8 +25,26 @@
 
     const formData = new FormData(event.target as HTMLFormElement);
     const name = formData.get("name") as string;
-    const image = formData.get("image") as string;
-    const { error } = await authClient.updateUser({ name, image });
+    const avatar = formData.get("avatar") as File;
+
+    // Upload the file first...
+    const upload = await api.api.v1.upload.post({
+      files: [avatar],
+      location: "avatar",
+    });
+
+    if (upload.error) {
+      console.error(upload.error);
+      return;
+    }
+
+    console.log(upload.data.files);
+
+    const { error } = await authClient.updateUser({
+      name,
+      image: upload.data.files[0],
+    });
+
     if (error) {
       console.error(error);
     }
@@ -78,6 +97,7 @@
                   class="absolute inset-0 cursor-pointer opacity-0"
                   onchange={handleAvatarChange}
                   aria-label="Upload profile image"
+                  name="avatar"
                 >
               </Button>
               <Button
