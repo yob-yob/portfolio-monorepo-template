@@ -2,18 +2,19 @@
   import "./layout.css";
   import { authClient } from "@asset-tracking/auth/client";
   import { ModeWatcher } from "mode-watcher";
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import favicon from "$lib/assets/favicon.svg";
   import AppSidebar from "$lib/components/app-sidebar.svelte";
   import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
   import { Separator } from "$lib/components/ui/separator/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+  import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
 
   const { children } = $props();
   const session = authClient.useSession();
 
   session.subscribe((session) => {
-    console.log("session changed", session);
     if (!session.isPending && session.data === null) {
       goto("/auth/login");
     } else if (
@@ -22,6 +23,17 @@
     ) {
       goto("/");
     }
+  });
+
+  onMount(() => {
+    const homeCrumb = breadcrumbs.addCrumb({
+      href: "/",
+      label: "Home",
+    });
+
+    return () => {
+      breadcrumbs.removeCrumb(homeCrumb);
+    };
   });
 </script>
 
@@ -32,14 +44,17 @@
 <ModeWatcher />
 
 {#if $session.isPending}
+  <!-- We're still checking if session is authenticated. -->
   <div class="flex items-center justify-center h-screen">
     <div
       class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900 dark:border-white"
     ></div>
   </div>
 {:else if $session.data === null}
+  <!-- GUEST PAGES Layout -->
   {@render children()}
 {:else}
+  <!-- AUTH PAGES Layout -->
   <Sidebar.Provider>
     <AppSidebar />
     <Sidebar.Inset>
@@ -54,15 +69,17 @@
           />
           <Breadcrumb.Root>
             <Breadcrumb.List>
-              <Breadcrumb.Item class="hidden md:block">
-                <Breadcrumb.Link href="##"
-                  >Build Your Application</Breadcrumb.Link
-                >
-              </Breadcrumb.Item>
-              <Breadcrumb.Separator class="hidden md:block" />
-              <Breadcrumb.Item>
-                <Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
-              </Breadcrumb.Item>
+              {#each breadcrumbs.breadcrumbs as crumb, index}
+                <Breadcrumb.Item>
+                  <Breadcrumb.Link href={crumb.href}>
+                    {crumb.label}
+                  </Breadcrumb.Link>
+                </Breadcrumb.Item>
+
+                {#if index < breadcrumbs.breadcrumbs.size - 1}
+                  <Breadcrumb.Separator class="hidden md:block" />
+                {/if}
+              {/each}
             </Breadcrumb.List>
           </Breadcrumb.Root>
         </div>

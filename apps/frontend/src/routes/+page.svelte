@@ -1,3 +1,19 @@
+<script lang="ts">
+  import { onMount } from "svelte";
+  import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
+
+  onMount(() => {
+    const dashboardCrumb = breadcrumbs.addCrumb({
+      href: "/",
+      label: "Dashboard",
+    });
+
+    return () => {
+      breadcrumbs.removeCrumb(dashboardCrumb);
+    };
+  });
+</script>
+
 <div class="grid auto-rows-min gap-4 md:grid-cols-3">
   <div class="bg-muted/50 aspect-video rounded-xl"></div>
   <div class="bg-muted/50 aspect-video rounded-xl"></div>

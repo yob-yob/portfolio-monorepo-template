@@ -1,11 +1,14 @@
 <script lang="ts">
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
+  import HomeIcon from "@lucide/svelte/icons/home";
   import type { Component } from "svelte";
+  import { goto } from "$app/navigation";
   import * as Collapsible from "$lib/components/ui/collapsible/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 
   let {
     items,
+    title = "Platform",
   }: {
     items: {
       title: string;
@@ -18,12 +21,19 @@
         url: string;
       }[];
     }[];
+    title?: string;
   } = $props();
 </script>
 
 <Sidebar.Group>
-  <Sidebar.GroupLabel>Platform</Sidebar.GroupLabel>
+  <Sidebar.GroupLabel>{title}</Sidebar.GroupLabel>
   <Sidebar.Menu>
+    <Sidebar.MenuItem>
+      <Sidebar.MenuButton onclick={() => goto("/")} isActive={true}>
+        <HomeIcon />
+        Dashboard
+      </Sidebar.MenuButton>
+    </Sidebar.MenuItem>
     {#each items as item (item.title)}
       <Collapsible.Root open={item.isActive} class="group/collapsible">
         {#snippet child({ props })}

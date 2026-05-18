@@ -22,6 +22,7 @@ const config = {
 
     alias: {
       "@/api-client/*": "../../packages/api-client/src/*",
+      "@/auth/client": "../../packages/auth/src/auth-client.ts",
     },
   },
 };
