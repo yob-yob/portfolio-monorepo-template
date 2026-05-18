@@ -7,8 +7,8 @@
     ".": "./src/client.ts"
   },
   "dependencies": {
-    "@elysia/eden": "^1.4.10",
-    "elysia": "^1.4.28"
+    "@elysia/eden": "latest",
+    "elysia": "latest"
   },
   "devDependencies": {
     "@asset-tracking/backend": "workspace:*",

@@ -23,12 +23,13 @@
   "catalog": {
     "typescript": "^6.0.2"
   },
-
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
-
+  "overrides": {
+    "@sinclair/typebox": "0.34.49"
+  },
   "lint-staged": {
     "*.{ts,json,css,md}": [
       "bun x ultracite fix"
