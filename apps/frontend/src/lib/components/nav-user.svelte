@@ -11,9 +11,11 @@
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import { useSidebar } from "$lib/components/ui/sidebar/index.js";
 
-  let { user }: { user: { name: string; email: string; avatar: string } } =
+  let { user }: { user: { name: string; email: string; image: string } } =
     $props();
   const sidebar = useSidebar();
+
+  const avatarFallback = $derived.by(() => user.name.charAt(0));
 </script>
 
 <Sidebar.Menu>
@@ -27,8 +29,10 @@
             {...props}
           >
             <Avatar.Root class="size-8 rounded-lg">
-              <Avatar.Image src={user.avatar} alt={user.name} />
-              <Avatar.Fallback class="rounded-lg">CN</Avatar.Fallback>
+              <Avatar.Image src={user.image} alt={user.name} />
+              <Avatar.Fallback class="rounded-lg">
+                {avatarFallback}
+              </Avatar.Fallback>
             </Avatar.Root>
             <div class="grid flex-1 text-start text-sm leading-tight">
               <span class="truncate font-medium">{user.name}</span>
@@ -47,8 +51,10 @@
         <DropdownMenu.Label class="p-0 font-normal">
           <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
             <Avatar.Root class="size-8 rounded-lg">
-              <Avatar.Image src={user.avatar} alt={user.name} />
-              <Avatar.Fallback class="rounded-lg">CN</Avatar.Fallback>
+              <Avatar.Image src={user.image} alt={user.name} />
+              <Avatar.Fallback class="rounded-lg">
+                {avatarFallback}
+              </Avatar.Fallback>
             </Avatar.Root>
             <div class="grid flex-1 text-start text-sm leading-tight">
               <span class="truncate font-medium">{user.name}</span>

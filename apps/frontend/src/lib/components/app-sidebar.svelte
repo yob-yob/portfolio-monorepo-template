@@ -1,5 +1,4 @@
 <script lang="ts" module>
-  import { authClient } from "@asset-tracking/auth/client";
   import AudioWaveformIcon from "@lucide/svelte/icons/audio-waveform";
   import BookOpenIcon from "@lucide/svelte/icons/book-open";
   import BotIcon from "@lucide/svelte/icons/bot";
@@ -137,38 +136,25 @@
 </script>
 
 <script lang="ts">
-  import type { ComponentProps } from "svelte";
+  import { type ComponentProps } from "svelte";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import NavMain from "./nav-main.svelte";
   import NavProjects from "./nav-projects.svelte";
   import NavUser from "./nav-user.svelte";
   import TeamSwitcher from "./team-switcher.svelte";
 
-  const session = authClient.useSession();
+  interface User {
+    email: string;
+    image: string;
+    name: string;
+  }
 
   let {
     ref = $bindable(null),
     collapsible = "icon",
+    user = $bindable<User>(),
     ...restProps
-  }: ComponentProps<typeof Sidebar.Root> = $props();
-
-  const user = $derived.by(() => {
-    if ($session.data) {
-      return {
-        name: $session.data.user.name,
-        email: $session.data.user.email,
-        avatar:
-          $session.data.user.image ??
-          "https://api.dicebear.com/9.x/thumbs/svg?seed=Felix",
-      };
-    }
-
-    return {
-      name: "Loading...",
-      email: "Loading...",
-      avatar: "https://api.dicebear.com/9.x/thumbs/svg?seed=Felix",
-    };
-  });
+  }: ComponentProps<typeof Sidebar.Root> & { user: User } = $props();
 </script>
 
 <Sidebar.Root bind:ref {collapsible} {...restProps}>
