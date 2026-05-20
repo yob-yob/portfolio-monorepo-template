@@ -21,6 +21,7 @@ export abstract class OnboardingService {
           name: body.name,
           email: body.email,
           password: body.password,
+          callbackURL: "/onboarding/organization",
         },
       });
 
