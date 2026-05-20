@@ -6,6 +6,7 @@
       "@/backend/*": ["../../apps/backend/src/*"],
       "@/api-client/*": ["./src/*"]
     },
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "strict": true
   }
 }

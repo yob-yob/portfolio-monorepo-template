@@ -2,7 +2,7 @@
   import { authClient } from "@asset-tracking/auth/client";
   import type { HTMLAttributes } from "svelte/elements";
   import { goto } from "$app/navigation";
-  import loginBanner from "$lib/assets/login-banner.png";
+  import loginBanner from "$lib/assets/login-banner.svg";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import {
@@ -30,7 +30,10 @@
     const formData = new FormData(event.target as HTMLFormElement);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    const { data, error } = await authClient.signIn.email({ email, password });
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
+    });
     if (error) {
       errorMessage = error.message ?? "An unknown error occurred";
     } else {

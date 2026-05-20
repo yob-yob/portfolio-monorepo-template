@@ -1,7 +1,7 @@
 <script lang="ts">
   import { api } from "@asset-tracking/api-client";
   import type { HTMLAttributes } from "svelte/elements";
-  import loginBanner from "$lib/assets/login-banner.png";
+  import loginBanner from "$lib/assets/login-banner.svg";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import {
@@ -31,8 +31,10 @@
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
+    const organizationName = formData.get("organizationName") as string;
     const { error } = await api.api.v1.onboarding.post({
       name,
+      organizationName,
       email,
       password,
       confirmPassword,
@@ -62,6 +64,18 @@
               type="text"
               name="name"
               placeholder="John Doe"
+              required
+            />
+          </Field>
+          <Field>
+            <FieldLabel for={`organization-name-${id}`}>
+              Organization Name
+            </FieldLabel>
+            <Input
+              id="organization-name-{id}"
+              type="text"
+              name="organizationName"
+              placeholder="Carcar City Government"
               required
             />
           </Field>

@@ -16,7 +16,5 @@
       <ProfileSettingsNav />
     </div>
   </aside>
-  <main class="min-w-0 flex-1 space-y-8">
-    {@render children()}
-  </main>
+  <main class="min-w-0 flex-1 space-y-8"> {@render children()} </main>
 </div>

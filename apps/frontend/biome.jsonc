@@ -7,6 +7,12 @@
       }
     }
   },
+  "html": {
+    "formatter": {
+      "whitespaceSensitivity": "strict",
+      "indentScriptAndStyle": true
+    }
+  },
   "overrides": [
     {
       "includes": ["**/*.svelte"],

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { authClient } from "@asset-tracking/auth/client";
   import type { HTMLAttributes } from "svelte/elements";
-  import loginBanner from "$lib/assets/login-banner.png";
+  import loginBanner from "$lib/assets/login-banner.svg";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import {
@@ -42,7 +42,7 @@
       <form class="p-6 md:p-8" onsubmit={handleSubmit}>
         <FieldGroup>
           <div class="flex flex-col items-center gap-2 text-center">
-            <h1 class="text-2xl font-bold">Forgot your password?</h1>
+            <h1 class="text-2xl font-bold"> Forgot your password? </h1>
             <p class="text-muted-foreground text-balance">
               Enter your email to reset your password
             </p>
