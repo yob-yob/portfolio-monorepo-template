@@ -21,6 +21,7 @@ const config = {
     }),
 
     alias: {
+      "@/backend/*": "../../apps/backend/src/*",
       "@/api-client/*": "../../packages/api-client/src/*",
       "@/auth/client": "../../packages/auth/src/auth-client.ts",
     },
