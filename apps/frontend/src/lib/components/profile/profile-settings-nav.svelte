@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { page } from "$app/state";
   import AlertTriangleIcon from "@lucide/svelte/icons/alert-triangle";
   import MonitorSmartphoneIcon from "@lucide/svelte/icons/monitor-smartphone";
   import UserRoundIcon from "@lucide/svelte/icons/user-round";
+  import { page } from "$app/state";
   import { Button } from "$lib/components/ui/button/index.js";
   import { cn } from "$lib/utils.js";
 
@@ -35,7 +35,7 @@
 <nav aria-label="Profile settings" class="flex flex-col gap-1">
   {#each navItems as item (item.href)}
     {@const isActive = item.match(page.url.pathname)}
-  <Button
+    <Button
       href={item.href}
       variant={isActive ? "secondary" : "ghost"}
       class={cn(
@@ -51,9 +51,7 @@
       <item.icon class="size-4 shrink-0" />
       <span class="flex min-w-0 flex-col gap-0.5">
         <span class="truncate font-medium">{item.label}</span>
-        <span
-          class="text-muted-foreground truncate text-xs font-normal"
-        >
+        <span class="text-muted-foreground truncate text-xs font-normal">
           {item.description}
         </span>
       </span>

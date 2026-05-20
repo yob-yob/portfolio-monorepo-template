@@ -82,8 +82,8 @@
             <p class="font-medium">Check your inbox</p>
             <p class="text-muted-foreground">
               We sent a verification link to
-              <span class="text-foreground font-medium">{newEmail}</span>.
-              Open the link or enter the code below to confirm your new email.
+              <span class="text-foreground font-medium">{newEmail}</span>. Open
+              the link or enter the code below to confirm your new email.
             </p>
           </div>
         </div>

@@ -22,12 +22,8 @@
       <Card.Description>{description}</Card.Description>
     {/if}
   </Card.Header>
-  <Card.Content>
-    {@render children()}
-  </Card.Content>
+  <Card.Content> {@render children()} </Card.Content>
   {#if footer}
-    <Card.Footer class="border-t">
-      {@render footer()}
-    </Card.Footer>
+    <Card.Footer class="border-t"> {@render footer()} </Card.Footer>
   {/if}
 </Card.Root>

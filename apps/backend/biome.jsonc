@@ -1,0 +1,15 @@
+{
+  "extends": "//",
+  "overrides": [
+    {
+      "includes": ["**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noStaticOnlyClass": "off"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -35,9 +35,7 @@
     </p>
   </div>
 
-  <Card.Root
-    class="border-destructive/50 bg-destructive/5 gap-4 py-6"
-  >
+  <Card.Root class="border-destructive/50 bg-destructive/5 gap-4 py-6">
     <Card.Header class="pb-0">
       <div class="flex items-start gap-3">
         <div
@@ -55,9 +53,7 @@
       </div>
     </Card.Header>
     <Card.Content class="space-y-4">
-      <ul
-        class="text-muted-foreground list-inside list-disc space-y-1 text-sm"
-      >
+      <ul class="text-muted-foreground list-inside list-disc space-y-1 text-sm">
         <li>All personal data will be erased from our systems.</li>
         <li>Active sessions will be revoked on every device.</li>
         <li>You will not be able to recover your account or data.</li>
@@ -74,7 +70,11 @@
           I want to delete my account
         </Button>
       {:else}
-        <form id="profile-delete-form" class="space-y-4" onsubmit={handleSubmit}>
+        <form
+          id="profile-delete-form"
+          class="space-y-4"
+          onsubmit={handleSubmit}
+        >
           <FieldGroup>
             <Field>
               <div class="flex items-start gap-3">
@@ -83,7 +83,7 @@
                   type="checkbox"
                   bind:checked={understands}
                   class="border-input mt-1 size-4 rounded border"
-                />
+                >
                 <div class="space-y-1">
                   <Label for="delete-understand-{id}" class="font-medium">
                     I understand this action is permanent
@@ -97,7 +97,8 @@
 
             <Field>
               <FieldLabel for="delete-confirm-{id}">
-                Type <span class="font-mono font-semibold">{confirmPhrase}</span>
+                Type
+                <span class="font-mono font-semibold">{confirmPhrase}</span>
                 to confirm
               </FieldLabel>
               <Input
@@ -126,11 +127,7 @@
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              variant="destructive"
-              disabled={!canDelete}
-            >
+            <Button type="submit" variant="destructive" disabled={!canDelete}>
               Delete my account permanently
             </Button>
           </div>
