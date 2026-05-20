@@ -11,7 +11,7 @@ export const onboarding = new Elysia()
     {
       body: OnboardingModel.onboardingCompleteBody,
       beforeHandle({ body }) {
-        same(body.password, body.confirmPassword);
+        return same(body.password, body.confirmPassword) ?? null;
       },
     }
   );

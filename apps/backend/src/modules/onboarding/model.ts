@@ -3,6 +3,7 @@ import { t, type UnwrapSchema } from "elysia";
 export const OnboardingModel = {
   onboardingCompleteBody: t.Object({
     name: t.String(),
+    organization_name: t.String(),
     email: t.String({
       format: "email",
     }),
