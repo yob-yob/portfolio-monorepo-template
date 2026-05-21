@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { api } from "@asset-tracking/api-client";
   import CameraIcon from "@lucide/svelte/icons/camera";
   import { authClient } from "@/auth/client";
+  import { backend } from "$lib/api";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import {
@@ -28,7 +28,7 @@
     const avatar = formData.get("avatar") as File;
 
     // Upload the file first...
-    const upload = await api.api.v1.upload.post({
+    const upload = await backend.api.v1.upload.post({
       files: [avatar],
       location: "avatar",
     });

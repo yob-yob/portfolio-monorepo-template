@@ -5,11 +5,11 @@
     "./app": "./src/app.ts"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
-    "build": "bun build --compile --target=bun --production --outfile dist/server src/index.ts",
+    "build": "bun build --compile --target=bun --production --outfile dist/backend_server src/index.ts",
     "lint": "eslint .",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "serve": "dist/backend_server"
   },
   "dependencies": {
     "@asset-tracking/database": "workspace:*",

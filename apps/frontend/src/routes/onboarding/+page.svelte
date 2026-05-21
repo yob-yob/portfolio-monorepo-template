@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { api } from "@asset-tracking/api-client";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import { backend } from "$lib/api";
   import DarkModeToggle from "$lib/components/dark-mode-toggle.svelte";
   import OnboardingForm from "$lib/components/forms/onboarding-form.svelte";
 
   onMount(async () => {
-    const { data, error } = await api.api.v1.onboarding.get();
+    const { data, error } = await backend.api.v1.onboarding.get();
 
     if (error) {
       // if there's an Error we don't want users to see this page...

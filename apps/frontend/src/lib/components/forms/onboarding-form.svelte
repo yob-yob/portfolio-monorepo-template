@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { api } from "@asset-tracking/api-client";
   import type { HTMLAttributes } from "svelte/elements";
+  import { backend } from "$lib/api";
   import loginBanner from "$lib/assets/login-banner.svg";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
@@ -32,7 +32,7 @@
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
     const organizationName = formData.get("organizationName") as string;
-    const { error } = await api.api.v1.onboarding.post({
+    const { error } = await backend.api.v1.onboarding.post({
       name,
       organizationName,
       email,

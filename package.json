@@ -9,6 +9,7 @@
     "auth:schema:generate": "bun run --cwd ./packages/auth schema:generate",
     "db:generate:migrations": "bun run --cwd ./packages/database db:generate",
     "db:migrate": "bun run --cwd ./packages/database db:migrate",
+    "serve": "bun run --parallel --workspaces --if-present serve",
     "lint:check": "ultracite check",
     "lint:fix": "ultracite fix",
     "lint:format": "biome format --write"
