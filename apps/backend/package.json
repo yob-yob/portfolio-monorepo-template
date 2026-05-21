@@ -12,8 +12,9 @@
     "serve": "dist/backend_server"
   },
   "dependencies": {
-    "@asset-tracking/database": "workspace:*",
     "@asset-tracking/auth": "workspace:*",
+    "@asset-tracking/database": "workspace:*",
+    "@elysia/cors": "^1.4.2",
     "@elysia/openapi": "^1.4.15",
     "@elysia/static": "^1.4.11",
     "elysia": "latest"

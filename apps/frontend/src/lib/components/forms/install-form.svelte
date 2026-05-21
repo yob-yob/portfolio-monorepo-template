@@ -1,7 +1,8 @@
 <script lang="ts">
   import ShieldCheckIcon from "@lucide/svelte/icons/shield-check";
   import type { HTMLAttributes } from "svelte/elements";
-  import { api } from "@/api-client/client";
+  import { goto } from "$app/navigation";
+  import { backend } from "$lib/api";
   import { Button } from "$lib/components/ui/button/index.js";
   import {
     Field,
@@ -42,18 +43,25 @@
       return;
     }
 
+    const formData = new FormData(event.target as HTMLFormElement);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
     isLoading = true;
     // API wiring: POST /api/v1/setup when backend drops organizationName from this step.
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    const response = api.api.v1.setup.post({
+    const { error } = await backend.api.v1.setup.post({
       name,
       email,
       password,
     });
 
-    if (response.error) {
-      errorMessage = response.error.message ?? "Installation failed.";
+    if (error) {
+      errorMessage = error.value.message ?? "Installation failed.";
+    } else {
+      goto("/");
     }
 
     isLoading = false;

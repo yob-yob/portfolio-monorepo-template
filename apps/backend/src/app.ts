@@ -1,3 +1,4 @@
+import { cors } from "@elysia/cors";
 import { openapi } from "@elysia/openapi";
 import { Elysia } from "elysia";
 import { apiV1 } from "@/backend/api/v1.ts";
@@ -14,6 +15,7 @@ export const app = new Elysia()
       },
     })
   )
+  .use(cors())
   .use(betterAuth)
   .use(apiV1)
   .use(storage);
