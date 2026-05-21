@@ -19,7 +19,8 @@
       goto("/auth/login");
     } else if (
       window.location.pathname.includes("/auth/") ||
-      window.location.pathname.includes("/onboarding")
+      window.location.pathname.includes("/onboarding") ||
+      window.location.pathname.includes("/install")
     ) {
       goto("/");
     }

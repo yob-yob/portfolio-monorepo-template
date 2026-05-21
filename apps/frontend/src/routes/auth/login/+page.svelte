@@ -6,16 +6,10 @@
   import LoginForm from "$lib/components/forms/login-form.svelte";
 
   onMount(async () => {
-    // Should On-Board
-    const { data, error } = await api.api.v1.onboarding.get();
+    const { data, error } = await api.api.v1.setup.get();
 
-    if (error) {
-      // if there's an Error we don't want users to see this page...
-      return;
-    }
-
-    if (data.shouldOnBoard) {
-      goto("/onboarding");
+    if (!error && data.shouldSetup) {
+      goto("/install");
     }
   });
 </script>

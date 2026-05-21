@@ -2,6 +2,7 @@ import { db } from "@asset-tracking/database/db";
 import { users } from "@asset-tracking/database/schemas/auth";
 import Elysia from "elysia";
 import { onboarding } from "@/backend/modules/onboarding/index.ts";
+import { setup } from "../modules/setup/index.ts";
 import { Upload } from "../modules/upload/index.ts";
 
 export const apiV1 = new Elysia({
@@ -9,6 +10,7 @@ export const apiV1 = new Elysia({
   tags: ["API v1"],
 })
   .use(onboarding)
+  .use(setup)
   .use(Upload)
   .get("/health", async ({ status }) => {
     // test db

@@ -145,7 +145,7 @@
 
   interface User {
     email: string;
-    image: string;
+    image?: string | null;
     name: string;
   }
 
