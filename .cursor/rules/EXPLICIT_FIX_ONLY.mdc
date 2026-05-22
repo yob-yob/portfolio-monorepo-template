@@ -1,8 +1,6 @@
 ---
-description: Only apply code/config fixes when the user explicitly requests fixing or implementation.
 alwaysApply: true
 ---
-
 # Explicit fix and implementation requests
 
 The maintainer wants to **understand and own** changes in this system. The agent must respect that workflow.

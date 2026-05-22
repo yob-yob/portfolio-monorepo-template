@@ -5,7 +5,7 @@
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
   import CreditCardIcon from "@lucide/svelte/icons/credit-card";
   import LogOutIcon from "@lucide/svelte/icons/log-out";
-  import { goto } from "$app/navigation";
+  import { goto, invalidateAll } from "$app/navigation";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
@@ -80,7 +80,9 @@
           </DropdownMenu.Item>
         </DropdownMenu.Group>
         <DropdownMenu.Separator />
-        <DropdownMenu.Item onSelect={() => authClient.signOut()}>
+        <DropdownMenu.Item
+          onSelect={() => authClient.signOut({fetchOptions: { onSuccess: () => invalidateAll() }})}
+        >
           <LogOutIcon />
           Log out
         </DropdownMenu.Item>

@@ -1,5 +1,7 @@
 <script lang="ts">
+  import type { Treaty } from "@elysia/eden";
   import CameraIcon from "@lucide/svelte/icons/camera";
+  import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
   import { backend } from "$lib/api";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
@@ -27,27 +29,41 @@
     const name = formData.get("name") as string;
     const avatar = formData.get("avatar") as File;
 
-    // Upload the file first...
-    const upload = await backend.api.v1.upload.post({
-      files: [avatar],
-      location: "avatar",
-    });
+    let image: string | undefined;
 
-    if (upload.error) {
-      console.error(upload.error);
+    if (avatar.size === 0 && name === user.name) {
+      toast.warning("Nothing to update");
       return;
     }
 
-    console.log(upload.data.files);
+    // Only Upload anything if the use has uploaded something...
+    if (avatar.size > 0) {
+      const upload = await backend.api.v1.upload.post({
+        files: [avatar],
+        location: "avatar",
+      });
+
+      if (upload.error) {
+        toast.error(
+          `Failed to upload profile picture: ${upload.error.value.message}`
+        );
+        return;
+      }
+
+      image = upload.data.files[0];
+    }
 
     const { error } = await authClient.updateUser({
       name,
-      image: upload.data.files[0],
+      image,
     });
 
     if (error) {
-      console.error(error);
+      toast.error(`Failed to update profile: ${error.message}`);
+      return;
     }
+
+    toast.success("Profile updated successfully");
   };
 
   const handleAvatarChange = (event: Event) => {

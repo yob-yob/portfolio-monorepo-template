@@ -4,18 +4,16 @@ import { users } from "@asset-tracking/database/schemas/auth";
 import { status } from "elysia";
 import type { OnboardingModel } from "./model.ts";
 
-export abstract class OnboardingService {
-  static async shouldOnBoard() {
+export const OnboardingService = {
+  async shouldOnBoard() {
     // Check if user belongs to an organization
     const user = await db.select().from(users).limit(1);
 
     return status(200, {
       shouldOnBoard: user.length === 0,
     });
-  }
-  static async onboardingComplete(
-    body: OnboardingModel["onboardingCompleteBody"]
-  ) {
+  },
+  async onboardingComplete(body: OnboardingModel["onboardingCompleteBody"]) {
     try {
       const data = await auth.api.signUpEmail({
         body: {
@@ -32,5 +30,5 @@ export abstract class OnboardingService {
         message: (error as Error).message,
       });
     }
-  }
-}
+  },
+};

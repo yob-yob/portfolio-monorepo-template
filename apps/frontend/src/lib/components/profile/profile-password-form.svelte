@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { toast } from "svelte-sonner";
+  import { authClient } from "@/auth/client";
   import { Button } from "$lib/components/ui/button/index.js";
   import {
     Field,
@@ -6,13 +8,41 @@
     FieldGroup,
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
-  import { Input } from "$lib/components/ui/input/index.js";
+  import * as Password from "$lib/components/ui/password";
   import ProfileSettingsSection from "./profile-settings-section.svelte";
 
   const id = $props.id();
 
-  const handleSubmit = (event: Event) => {
+  const handleSubmit = async (event: Event) => {
     event.preventDefault();
+
+    const formData = new FormData(event.target as HTMLFormElement);
+    const currentPassword = formData.get("currentPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (currentPassword === newPassword) {
+      toast.warning("New password cannot be the same as the current password");
+      return;
+    }
+
+    if (confirmPassword !== newPassword) {
+      toast.warning("Passwords do not match");
+      return;
+    }
+
+    const { error } = await authClient.changePassword({
+      newPassword,
+      currentPassword,
+      revokeOtherSessions: true,
+    });
+
+    if (error) {
+      toast.error(`Failed to update password: ${error.message}`);
+      return;
+    }
+
+    toast.success("Password updated successfully");
   };
 </script>
 
@@ -25,23 +55,30 @@
       <FieldGroup>
         <Field>
           <FieldLabel for="current-password-{id}">Current password</FieldLabel>
-          <Input
-            id="current-password-{id}"
-            name="currentPassword"
-            type="password"
-            autocomplete="current-password"
-            required
-          />
+          <Password.Root>
+            <Password.Input
+              id="current-password-{id}"
+              name="currentPassword"
+              autocomplete="current-password"
+              required
+            >
+              <Password.ToggleVisibility />
+            </Password.Input>
+          </Password.Root>
         </Field>
         <Field>
           <FieldLabel for="new-password-{id}">New password</FieldLabel>
-          <Input
-            id="new-password-{id}"
-            name="newPassword"
-            type="password"
-            autocomplete="new-password"
-            required
-          />
+          <Password.Root>
+            <Password.Input
+              id="new-password-{id}"
+              name="newPassword"
+              autocomplete="new-password"
+              required
+            >
+              <Password.ToggleVisibility />
+            </Password.Input>
+            <Password.Strength />
+          </Password.Root>
           <FieldDescription>
             Use at least 8 characters with a mix of letters and numbers.
           </FieldDescription>
@@ -50,13 +87,16 @@
           <FieldLabel for="confirm-password-{id}">
             Confirm new password
           </FieldLabel>
-          <Input
-            id="confirm-password-{id}"
-            name="confirmPassword"
-            type="password"
-            autocomplete="new-password"
-            required
-          />
+          <Password.Root>
+            <Password.Input
+              id="confirm-password-{id}"
+              name="confirmPassword"
+              autocomplete="new-password"
+              required
+            >
+              <Password.ToggleVisibility />
+            </Password.Input>
+          </Password.Root>
         </Field>
       </FieldGroup>
     </form>

@@ -13,6 +13,7 @@
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
+  import * as Password from "$lib/components/ui/password";
   import { cn } from "$lib/utils.js";
 
   let { class: className, ...restProps }: HTMLAttributes<HTMLDivElement> =
@@ -74,12 +75,16 @@
                 Forgot your password?
               </a>
             </div>
-            <Input
-              id="password-{id}"
-              type="password"
-              name="password"
-              required
-            />
+            <Password.Root>
+              <Password.Input
+                id="password-{id}"
+                placeholder="Password"
+                name="password"
+                required
+              >
+                <Password.ToggleVisibility />
+              </Password.Input>
+            </Password.Root>
           </Field>
           <Field>
             <Button type="submit" class="cursor-pointer" disabled={isLoading}>
