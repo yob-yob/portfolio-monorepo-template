@@ -3,7 +3,7 @@
   import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import MailIcon from "@lucide/svelte/icons/mail";
   import { onDestroy } from "svelte";
-  import { fly } from "svelte/transition";
+  import { fade } from "svelte/transition";
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
   import { refreshAll } from "$app/navigation";
@@ -39,6 +39,77 @@
   let otpResendCooldownRemaining = $state(0);
 
   let otpResendCooldownInterval: ReturnType<typeof setInterval> | null = null;
+
+  let formBodyRef = $state<HTMLDivElement | null>(null);
+  let formBodyHeight = $state<number | undefined>(undefined);
+  let formBodyHeightReady = $state(false);
+
+  let footerRef = $state<HTMLDivElement | null>(null);
+  let footerHeight = $state<number | undefined>(undefined);
+  let footerHeightReady = $state(false);
+
+  const animatedHeightClass = (ready: boolean) =>
+    ready
+      ? "overflow-hidden transition-[height] duration-300 ease-in-out"
+      : "overflow-hidden";
+
+  const observeAnimatedHeight = (
+    node: HTMLDivElement,
+    setHeight: (height: number) => void,
+    setReady: (ready: boolean) => void
+  ) => {
+    const syncHeight = () => {
+      setHeight(node.offsetHeight);
+    };
+
+    syncHeight();
+    requestAnimationFrame(() => {
+      syncHeight();
+      setReady(true);
+    });
+
+    const observer = new ResizeObserver(syncHeight);
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+      setReady(false);
+    };
+  };
+
+  $effect(() => {
+    const node = formBodyRef;
+    if (!node) {
+      return;
+    }
+
+    return observeAnimatedHeight(
+      node,
+      (height) => {
+        formBodyHeight = height;
+      },
+      (ready) => {
+        formBodyHeightReady = ready;
+      }
+    );
+  });
+
+  $effect(() => {
+    const node = footerRef;
+    if (!node) {
+      return;
+    }
+
+    return observeAnimatedHeight(
+      node,
+      (height) => {
+        footerHeight = height;
+      },
+      (ready) => {
+        footerHeightReady = ready;
+      }
+    );
+  });
 
   const isOtpResendOnCooldown = $derived(otpResendCooldownRemaining > 0);
 
@@ -103,16 +174,6 @@
   onDestroy(() => {
     clearOtpResendCooldownInterval();
   });
-
-  const stepEnterTransition = {
-    y: 8,
-    duration: 220,
-  };
-
-  const stepExitTransition = {
-    y: -8,
-    duration: 180,
-  };
 
   const resetForm = () => {
     step = "idle";
@@ -271,75 +332,79 @@
 >
   {#snippet children()}
     <FieldGroup>
-      <Field>
-        <div class="flex items-center gap-2">
-          <FieldLabel for="current-email-{id}">Current email</FieldLabel>
-          {#if emailVerified}
-            <BadgeCheckIcon
-              class="text-primary size-4 shrink-0"
-              aria-label="Email verified"
-              title="Email verified"
+      <div
+        class={animatedHeightClass(formBodyHeightReady)}
+        style:height={formBodyHeight === undefined
+          ? undefined
+          : `${formBodyHeight}px`}
+      >
+        <div bind:this={formBodyRef} class="flex w-full flex-col gap-7">
+          <Field>
+            <div class="flex items-center gap-2">
+              <FieldLabel for="current-email-{id}">Current email</FieldLabel>
+              {#if emailVerified}
+                <BadgeCheckIcon
+                  class="text-primary size-4 shrink-0"
+                  aria-label="Email verified"
+                  title="Email verified"
+                />
+              {:else}
+                <CircleAlertIcon
+                  class="size-4 shrink-0 text-amber-600 dark:text-amber-500"
+                  aria-label="Email not verified"
+                />
+              {/if}
+            </div>
+            <Input
+              id="current-email-{id}"
+              type="email"
+              value={currentEmail}
+              disabled
+              class="bg-muted"
             />
-          {:else}
-            <CircleAlertIcon
-              class="size-4 shrink-0 text-amber-600 dark:text-amber-500"
-              aria-label="Email not verified"
-            />
-          {/if}
-        </div>
-        <Input
-          id="current-email-{id}"
-          type="email"
-          value={currentEmail}
-          disabled
-          class="bg-muted"
-        />
-        {#if step === "idle"}
-          <FieldDescription>
-            {#if emailVerified}
-              This email is verified and used to sign in.
-            {:else}
-              This email is not verified yet.
-            {/if}
-          </FieldDescription>
-        {/if}
-      </Field>
-
-      {#if step === "new-otp"}
-        <Field>
-          <FieldLabel for="new-email-display-{id}"
-            >New email address</FieldLabel
-          >
-          <Input
-            id="new-email-display-{id}"
-            type="email"
-            value={newEmail}
-            disabled
-            class="bg-muted"
-          />
-          <FieldDescription>
-            Enter the code we sent to this address to finish the change.
-          </FieldDescription>
-        </Field>
-      {/if}
-
-      <div class="min-h-80">
-        {#key step}
-          <div
-            class="flex flex-col gap-4"
-            in:fly={stepEnterTransition}
-            out:fly={stepExitTransition}
-          >
             {#if step === "idle"}
               <FieldDescription>
-                We will email a code to your current address so you can confirm
-                it is you before making a change.
+                {#if emailVerified}
+                  This email is verified and used to sign in.
+                {:else}
+                  This email is not verified yet.
+                {/if}
               </FieldDescription>
-            {:else if step === "request-change"}
-              <div
-                class="border-border bg-muted/50 flex gap-3 rounded-lg border p-4"
-                role="status"
+            {/if}
+          </Field>
+
+          {#if step === "new-otp"}
+            <Field>
+              <FieldLabel for="new-email-display-{id}"
+                >New email address</FieldLabel
               >
+              <Input
+                id="new-email-display-{id}"
+                type="email"
+                value={newEmail}
+                disabled
+                class="bg-muted"
+              />
+              <FieldDescription>
+                Enter the code we sent to this address to finish the change.
+              </FieldDescription>
+            </Field>
+          {/if}
+
+          <div class="flex flex-col gap-4">
+            {#if step === "idle"}
+              <div in:fade={{ duration: 180 }}>
+                <FieldDescription>
+                  We will email a code to your current address so you can confirm
+                  it is you before making a change.
+                </FieldDescription>
+              </div>
+            {:else if step === "request-change"}
+              <div in:fade={{ duration: 180 }} class="flex flex-col gap-4">
+                <div
+                  class="border-border bg-muted/50 flex gap-3 rounded-lg border p-4"
+                  role="status"
+                >
                 <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
                 <div class="space-y-1 text-sm">
                   <p class="font-medium">Step 2 of 3 — Confirm it is you</p>
@@ -417,11 +482,13 @@
                   </Field>
                 </FieldGroup>
               </form>
+              </div>
             {:else}
-              <div
-                class="border-border bg-muted/50 flex gap-3 rounded-lg border p-4"
-                role="status"
-              >
+              <div in:fade={{ duration: 180 }} class="flex flex-col gap-4">
+                <div
+                  class="border-border bg-muted/50 flex gap-3 rounded-lg border p-4"
+                  role="status"
+                >
                 <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
                 <div class="space-y-1 text-sm">
                   <p class="font-medium"
@@ -471,47 +538,55 @@
                   />
                 </Field>
               </form>
+              </div>
             {/if}
           </div>
-        {/key}
+        </div>
       </div>
     </FieldGroup>
   {/snippet}
   {#snippet footer()}
-    {#if step === "idle"}
-      <Button
-        type="button"
-        disabled={isLoading}
-        onclick={handleStartEmailChange}
-      >
-        Start email change
-      </Button>
-    {:else if step === "request-change"}
-      <div class="flex flex-wrap gap-2">
-        <Button type="button" variant="outline" onclick={resetForm}>
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          form="profile-email-request-form"
-          disabled={isLoading}
-        >
-          Send code to new email
-        </Button>
+    <div
+      class={animatedHeightClass(footerHeightReady)}
+      style:height={footerHeight === undefined ? undefined : `${footerHeight}px`}
+    >
+      <div bind:this={footerRef} class="w-full">
+        {#if step === "idle"}
+          <Button
+            type="button"
+            disabled={isLoading}
+            onclick={handleStartEmailChange}
+          >
+            Start email change
+          </Button>
+        {:else if step === "request-change"}
+          <div class="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" onclick={resetForm}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="profile-email-request-form"
+              disabled={isLoading}
+            >
+              Send code to new email
+            </Button>
+          </div>
+        {:else}
+          <div class="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" onclick={resetForm}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="profile-email-verify-form"
+              disabled={isLoading}
+            >
+              Confirm new email
+            </Button>
+          </div>
+        {/if}
       </div>
-    {:else}
-      <div class="flex flex-wrap gap-2">
-        <Button type="button" variant="outline" onclick={resetForm}>
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          form="profile-email-verify-form"
-          disabled={isLoading}
-        >
-          Confirm new email
-        </Button>
-      </div>
-    {/if}
+    </div>
   {/snippet}
 </ProfileSettingsSection>
