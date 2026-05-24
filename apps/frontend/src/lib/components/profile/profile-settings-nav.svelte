@@ -1,11 +1,10 @@
 <script lang="ts">
-  import AlertTriangleIcon from "@lucide/svelte/icons/alert-triangle";
+  import FileTextIcon from "@lucide/svelte/icons/file-text";
   import MailIcon from "@lucide/svelte/icons/mail";
   import MonitorSmartphoneIcon from "@lucide/svelte/icons/monitor-smartphone";
   import UserRoundIcon from "@lucide/svelte/icons/user-round";
   import { page } from "$app/state";
   import { Button } from "$lib/components/ui/button/index.js";
-  import { cn } from "$lib/utils.js";
 
   const navItems = [
     {
@@ -31,11 +30,12 @@
       match: (pathname: string) => pathname.startsWith("/profile/sessions"),
     },
     {
-      href: "/profile/delete",
-      label: "Delete account",
-      description: "Permanently remove your account",
-      icon: AlertTriangleIcon,
-      match: (pathname: string) => pathname.startsWith("/profile/delete"),
+      href: "/profile/account-retention",
+      label: "Account retention",
+      description: "Audit and compliance policy",
+      icon: FileTextIcon,
+      match: (pathname: string) =>
+        pathname.startsWith("/profile/account-retention"),
     },
   ] as const;
 </script>
@@ -46,15 +46,7 @@
     <Button
       href={item.href}
       variant={isActive ? "secondary" : "ghost"}
-      class={cn(
-        "h-auto w-full justify-start gap-3 px-3 py-2.5 text-start",
-        item.href === "/profile/delete" &&
-          !isActive &&
-          "text-destructive hover:text-destructive",
-        item.href === "/profile/delete" &&
-          isActive &&
-          "bg-destructive/10 text-destructive hover:bg-destructive/15"
-      )}
+      class="h-auto w-full justify-start gap-3 px-3 py-2.5 text-start"
     >
       <item.icon class="size-4 shrink-0" />
       <span class="flex min-w-0 flex-col gap-0.5">

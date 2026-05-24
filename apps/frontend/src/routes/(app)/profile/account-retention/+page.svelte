@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import ProfileDeleteAccount from "$lib/components/profile/profile-delete-account.svelte";
+  import ProfileAccountRetention from "$lib/components/profile/profile-account-retention.svelte";
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
 
   onMount(() => {
@@ -8,16 +8,16 @@
       href: "/profile",
       label: "Profile",
     });
-    const deleteCrumb = breadcrumbs.addCrumb({
-      href: "/profile/delete",
-      label: "Delete account",
+    const retentionCrumb = breadcrumbs.addCrumb({
+      href: "/profile/account-retention",
+      label: "Account retention",
     });
 
     return () => {
-      breadcrumbs.removeCrumb(deleteCrumb);
+      breadcrumbs.removeCrumb(retentionCrumb);
       breadcrumbs.removeCrumb(profileCrumb);
     };
   });
 </script>
 
-<ProfileDeleteAccount />
+<ProfileAccountRetention />

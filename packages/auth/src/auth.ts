@@ -54,5 +54,8 @@ export default betterAuth({
     changeEmail: {
       enabled: true,
     },
+    deleteUser: {
+      enabled: false,
+    },
   },
 });
