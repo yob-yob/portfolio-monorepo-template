@@ -1,7 +1,7 @@
 <script lang="ts">
   import { authClient } from "@asset-tracking/auth/client";
   import type { HTMLAttributes } from "svelte/elements";
-  import { goto } from "$app/navigation";
+  import { goto, invalidateAll } from "$app/navigation";
   import loginBanner from "$lib/assets/login-banner.svg";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
@@ -38,6 +38,7 @@
     if (error) {
       errorMessage = error.message ?? "An unknown error occurred";
     } else {
+      invalidateAll();
       goto(data.redirect && data.url ? data.url : "/");
     }
     isLoading = false;

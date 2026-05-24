@@ -17,8 +17,9 @@
 
   const id = $props.id();
 
-  const { currentEmail } = $props<{
+  const { currentEmail, emailVerified } = $props<{
     currentEmail: string;
+    emailVerified: boolean;
   }>();
 
   let step = $state<EmailChangeStep>("idle");

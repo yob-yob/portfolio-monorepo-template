@@ -8,10 +8,12 @@ export async function handle({ event, resolve }) {
     },
   });
 
-  // Make session and user available on server
   if (session?.data) {
     event.locals.user = session.data.user;
     event.locals.session = session.data.session;
+  } else {
+    event.locals.user = null;
+    event.locals.session = null;
   }
 
   return resolve(event);

@@ -11,7 +11,9 @@
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import { useSidebar } from "$lib/components/ui/sidebar/index.js";
 
-  let { user }: { user: { name: string; email: string; image: string } } =
+  let {
+    user,
+  }: { user: { name: string; email: string; image?: string | null } } =
     $props();
   const sidebar = useSidebar();
 

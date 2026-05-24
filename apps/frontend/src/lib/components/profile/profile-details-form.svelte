@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Treaty } from "@elysia/eden";
   import CameraIcon from "@lucide/svelte/icons/camera";
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
+  import { invalidateAll } from "$app/navigation";
   import { backend } from "$lib/api";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -64,6 +64,7 @@
     }
 
     toast.success("Profile updated successfully");
+    invalidateAll();
   };
 
   const handleAvatarChange = (event: Event) => {
