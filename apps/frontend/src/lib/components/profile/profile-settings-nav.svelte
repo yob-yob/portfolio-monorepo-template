@@ -1,5 +1,6 @@
 <script lang="ts">
   import FileTextIcon from "@lucide/svelte/icons/file-text";
+  import Link2Icon from "@lucide/svelte/icons/link-2";
   import MailIcon from "@lucide/svelte/icons/mail";
   import MonitorSmartphoneIcon from "@lucide/svelte/icons/monitor-smartphone";
   import UserRoundIcon from "@lucide/svelte/icons/user-round";
@@ -28,6 +29,13 @@
       description: "Active devices and sign-ins",
       icon: MonitorSmartphoneIcon,
       match: (pathname: string) => pathname.startsWith("/profile/sessions"),
+    },
+    {
+      href: "/profile/accounts",
+      label: "Connected accounts",
+      description: "Sign-in methods on your account",
+      icon: Link2Icon,
+      match: (pathname: string) => pathname.startsWith("/profile/accounts"),
     },
     {
       href: "/profile/account-retention",
