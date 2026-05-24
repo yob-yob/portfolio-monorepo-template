@@ -1,4 +1,6 @@
 <script lang="ts">
+  import BadgeCheckIcon from "@lucide/svelte/icons/badge-check";
+  import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import MailIcon from "@lucide/svelte/icons/mail";
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
@@ -13,7 +15,7 @@
   import { Input } from "$lib/components/ui/input/index.js";
   import ProfileSettingsSection from "./profile-settings-section.svelte";
 
-  type EmailChangeStep = "idle" | "current-otp" | "new-email" | "new-otp";
+  type EmailChangeStep = "idle" | "request-change" | "new-otp";
 
   const id = $props.id();
 
@@ -52,22 +54,16 @@
     }
 
     toast.success("Verification code sent to your current email");
-    step = "current-otp";
+    step = "request-change";
   };
 
-  const handleContinueToNewEmail = (event: Event) => {
+  const handleRequestNewEmail = async (event: Event) => {
     event.preventDefault();
 
     if (!currentEmailOtp.trim()) {
       toast.warning("Enter the verification code from your current email");
       return;
     }
-
-    step = "new-email";
-  };
-
-  const handleRequestNewEmail = async (event: Event) => {
-    event.preventDefault();
 
     const trimmedNewEmail = newEmail.trim();
 
@@ -123,9 +119,6 @@
 
     toast.success("Email address updated successfully");
     resetForm();
-
-    // We need to reset everything because the session needs to update
-    // so that we get a new user state.
     refreshAll();
   };
 
@@ -144,6 +137,7 @@
       return;
     }
 
+    currentEmailOtp = "";
     toast.success("Verification code resent to your current email");
   };
 
@@ -164,9 +158,9 @@
 
     currentEmailOtp = "";
     newEmailOtp = "";
-    step = "current-otp";
+    step = "request-change";
     toast.info(
-      "Verify your current email again to resend a code to your new address."
+      "Enter your current email code and new address again to resend a code to your new email."
     );
   };
 </script>
@@ -178,7 +172,21 @@
   {#snippet children()}
     <FieldGroup>
       <Field>
-        <FieldLabel for="current-email-{id}">Current email</FieldLabel>
+        <div class="flex items-center gap-2">
+          <FieldLabel for="current-email-{id}">Current email</FieldLabel>
+          {#if emailVerified}
+            <BadgeCheckIcon
+              class="text-primary size-4 shrink-0"
+              aria-label="Email verified"
+              title="Email verified"
+            />
+          {:else}
+            <CircleAlertIcon
+              class="size-4 shrink-0 text-amber-600 dark:text-amber-500"
+              aria-label="Email not verified"
+            />
+          {/if}
+        </div>
         <Input
           id="current-email-{id}"
           type="email"
@@ -187,7 +195,11 @@
           class="bg-muted"
         />
         <FieldDescription>
-          This is the email currently associated with your account.
+          {#if emailVerified}
+            This email is verified and used to sign in.
+          {:else}
+            This email is not verified yet.
+          {/if}
         </FieldDescription>
       </Field>
 
@@ -196,58 +208,55 @@
           Start the process to receive a verification code at your current email
           address.
         </FieldDescription>
-      {:else if step === "current-otp"}
+      {:else if step === "request-change"}
         <div
           class="border-border bg-muted/50 flex gap-3 rounded-lg border p-4"
           role="status"
         >
           <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
           <div class="space-y-1 text-sm">
-            <p class="font-medium">Check your current inbox</p>
+            <p class="font-medium">Verify your current email</p>
             <p class="text-muted-foreground">
               We sent a verification code to
               <span class="text-foreground font-medium">{currentEmail}</span>.
-              Enter it below to continue.
+              Enter that code and your new email address below.
             </p>
           </div>
         </div>
 
-        <form
-          id="profile-email-current-otp-form"
-          onsubmit={handleContinueToNewEmail}
-        >
-          <Field>
-            <FieldLabel for="current-email-otp-{id}">
-              Verification code
-            </FieldLabel>
-            <Input
-              id="current-email-otp-{id}"
-              name="currentEmailOtp"
-              bind:value={currentEmailOtp}
-              placeholder="Enter 6-digit code"
-              inputmode="numeric"
-              autocomplete="one-time-code"
-              required
-            />
-          </Field>
-        </form>
-      {:else if step === "new-email"}
-        <form id="profile-email-new-form" onsubmit={handleRequestNewEmail}>
-          <Field>
-            <FieldLabel for="new-email-{id}">New email address</FieldLabel>
-            <Input
-              id="new-email-{id}"
-              name="newEmail"
-              type="email"
-              bind:value={newEmail}
-              placeholder="you@example.com"
-              autocomplete="email"
-              required
-            />
-            <FieldDescription>
-              We will send a verification code to this address.
-            </FieldDescription>
-          </Field>
+        <form id="profile-email-request-form" onsubmit={handleRequestNewEmail}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel for="current-email-otp-{id}">
+                Current email verification code
+              </FieldLabel>
+              <Input
+                id="current-email-otp-{id}"
+                name="currentEmailOtp"
+                bind:value={currentEmailOtp}
+                placeholder="Enter 6-digit code"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                required
+              />
+            </Field>
+            <Field>
+              <FieldLabel for="new-email-{id}">New email address</FieldLabel>
+              <Input
+                id="new-email-{id}"
+                name="newEmail"
+                type="email"
+                bind:value={newEmail}
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              />
+              <FieldDescription>
+                We will send a verification code to this address after your
+                current email is verified.
+              </FieldDescription>
+            </Field>
+          </FieldGroup>
         </form>
       {:else}
         <div
@@ -294,7 +303,7 @@
       >
         Start email change
       </Button>
-    {:else if step === "current-otp"}
+    {:else if step === "request-change"}
       <div class="flex flex-wrap gap-2">
         <Button type="button" variant="outline" onclick={resetForm}>
           Cancel
@@ -309,20 +318,7 @@
         </Button>
         <Button
           type="submit"
-          form="profile-email-current-otp-form"
-          disabled={isLoading}
-        >
-          Continue
-        </Button>
-      </div>
-    {:else if step === "new-email"}
-      <div class="flex flex-wrap gap-2">
-        <Button type="button" variant="outline" onclick={resetForm}>
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          form="profile-email-new-form"
+          form="profile-email-request-form"
           disabled={isLoading}
         >
           Send verification code
