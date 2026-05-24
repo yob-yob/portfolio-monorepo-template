@@ -1,5 +1,6 @@
 <script lang="ts">
   import ShieldCheckIcon from "@lucide/svelte/icons/shield-check";
+  import type { ZxcvbnResult } from "@zxcvbn-ts/core";
   import type { HTMLAttributes } from "svelte/elements";
   import { goto } from "$app/navigation";
   import { backend } from "$lib/api";
@@ -11,6 +12,7 @@
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
+  import * as Password from "$lib/components/ui/password";
   import { Separator } from "$lib/components/ui/separator/index.js";
   import { cn } from "$lib/utils.js";
 
@@ -24,6 +26,7 @@
   let password = $state("");
   let confirmPassword = $state("");
   let confirmTouched = $state(false);
+  let passwordStrength = $state<ZxcvbnResult>();
 
   const passwordsMatch = $derived(
     confirmPassword.length === 0 || password === confirmPassword
@@ -43,14 +46,17 @@
       return;
     }
 
+    if (passwordStrength && passwordStrength.score < 2) {
+      errorMessage =
+        "Password strength is too weak. Please choose a stronger password.";
+      return;
+    }
+
     const formData = new FormData(event.target as HTMLFormElement);
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
 
     isLoading = true;
-    // API wiring: POST /api/v1/setup when backend drops organizationName from this step.
-    await new Promise((resolve) => setTimeout(resolve, 0));
 
     const { error } = await backend.api.v1.setup.post({
       name,
@@ -200,42 +206,43 @@
             </p>
           </div>
 
-          <div class="grid gap-3 sm:grid-cols-2">
+          <div class="grid gap-3 grid-cols-1">
             <Field class="gap-2">
               <FieldLabel for="install-password-{id}">Password</FieldLabel>
-              <Input
-                id="install-password-{id}"
-                type="password"
-                name="password"
-                autocomplete="new-password"
-                bind:value={password}
-                minlength={8}
-                maxlength={20}
-                required
-              />
+              <Password.Root minScore={2}>
+                <Password.Input
+                  id="install-password-{id}"
+                  name="password"
+                  autocomplete="new-password"
+                  bind:value={password}
+                  required
+                >
+                  <Password.ToggleVisibility />
+                </Password.Input>
+                <Password.Strength bind:strength={passwordStrength} />
+              </Password.Root>
             </Field>
 
             <Field class="gap-2">
               <FieldLabel for="install-confirm-password-{id}">
                 Confirm password
               </FieldLabel>
-              <Input
-                id="install-confirm-password-{id}"
-                type="password"
-                name="confirmPassword"
-                autocomplete="new-password"
-                bind:value={confirmPassword}
-                onblur={() => {
-                  confirmTouched = true;
-                }}
-                aria-invalid={showPasswordMismatch}
-                aria-describedby={showPasswordMismatch
+              <Password.Root minScore={2}>
+                <Password.Input
+                  id="install-confirm-password-{id}"
+                  name="confirmPassword"
+                  autocomplete="new-password"
+                  bind:value={confirmPassword}
+                  required
+                  aria-describedby={showPasswordMismatch
                   ? `install-confirm-password-error-${id}`
                   : undefined}
-                minlength={8}
-                maxlength={20}
-                required
-              />
+                  onblur={() => confirmTouched = true}
+                >
+                  <Password.ToggleVisibility />
+                </Password.Input>
+              </Password.Root>
+
               {#if showPasswordMismatch}
                 <FieldError id="install-confirm-password-error-{id}">
                   Passwords do not match.
