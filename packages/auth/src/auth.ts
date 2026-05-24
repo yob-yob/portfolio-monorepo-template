@@ -7,6 +7,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { openAPI, organization } from "better-auth/plugins";
 import { Redis } from "ioredis";
+import { emailOtpPluginConfiguration } from "./plugins/mail-otp.ts";
 
 if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set");
@@ -38,7 +39,7 @@ export default betterAuth({
     fallback: "http://localhost:3000",
   },
   basePath: "/",
-  plugins: [openAPI(), organization()],
+  plugins: [openAPI(), organization(), emailOtpPluginConfiguration],
   emailAndPassword: { enabled: true },
   secret: process.env.BETTER_AUTH_SECRET,
   advanced: {
@@ -48,5 +49,10 @@ export default betterAuth({
   },
   session: {
     preserveSessionInDatabase: true,
+  },
+  user: {
+    changeEmail: {
+      enabled: true,
+    },
   },
 });

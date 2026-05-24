@@ -1,5 +1,8 @@
 <script lang="ts">
   import MailIcon from "@lucide/svelte/icons/mail";
+  import { toast } from "svelte-sonner";
+  import { authClient } from "@/auth/client";
+  import { refreshAll } from "$app/navigation";
   import { Button } from "$lib/components/ui/button/index.js";
   import {
     Field,
@@ -10,36 +13,166 @@
   import { Input } from "$lib/components/ui/input/index.js";
   import ProfileSettingsSection from "./profile-settings-section.svelte";
 
+  type EmailChangeStep = "idle" | "current-otp" | "new-email" | "new-otp";
+
   const id = $props.id();
 
-  // Placeholder values for UI only
-  const currentEmail = "jane.cooper@example.com";
-  let newEmail = $state("");
-  let verificationCode = $state("");
-  let step = $state<"idle" | "pending">("idle");
+  const { currentEmail } = $props<{
+    currentEmail: string;
+  }>();
 
-  const handleSendVerification = (event: Event) => {
-    event.preventDefault();
-    if (!newEmail.trim()) {
+  let step = $state<EmailChangeStep>("idle");
+  let currentEmailOtp = $state("");
+  let newEmail = $state("");
+  let newEmailOtp = $state("");
+  let isLoading = $state(false);
+
+  const resetForm = () => {
+    step = "idle";
+    currentEmailOtp = "";
+    newEmail = "";
+    newEmailOtp = "";
+    isLoading = false;
+  };
+
+  const handleStartEmailChange = async () => {
+    isLoading = true;
+
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
+      email: currentEmail,
+      type: "email-verification",
+    });
+
+    isLoading = false;
+
+    if (error) {
+      toast.error(`Failed to send verification code: ${error.message}`);
       return;
     }
-    step = "pending";
+
+    toast.success("Verification code sent to your current email");
+    step = "current-otp";
   };
 
-  const handleCancelEmailChange = () => {
-    step = "idle";
-    newEmail = "";
-    verificationCode = "";
-  };
-
-  const handleConfirmEmail = (event: Event) => {
+  const handleContinueToNewEmail = (event: Event) => {
     event.preventDefault();
+
+    if (!currentEmailOtp.trim()) {
+      toast.warning("Enter the verification code from your current email");
+      return;
+    }
+
+    step = "new-email";
+  };
+
+  const handleRequestNewEmail = async (event: Event) => {
+    event.preventDefault();
+
+    const trimmedNewEmail = newEmail.trim();
+
+    if (!trimmedNewEmail) {
+      toast.warning("Enter your new email address");
+      return;
+    }
+
+    if (trimmedNewEmail.toLowerCase() === currentEmail.toLowerCase()) {
+      toast.warning("New email must be different from your current email");
+      return;
+    }
+
+    isLoading = true;
+
+    const { error } = await authClient.emailOtp.requestEmailChange({
+      newEmail: trimmedNewEmail,
+      otp: currentEmailOtp,
+    });
+
+    isLoading = false;
+
+    if (error) {
+      toast.error(`Failed to send verification code: ${error.message}`);
+      return;
+    }
+
+    toast.success("Verification code sent to your new email");
+    step = "new-otp";
+  };
+
+  const handleConfirmEmailChange = async (event: Event) => {
+    event.preventDefault();
+
+    if (!newEmailOtp.trim()) {
+      toast.warning("Enter the verification code from your new email");
+      return;
+    }
+
+    isLoading = true;
+
+    const { error } = await authClient.emailOtp.changeEmail({
+      newEmail: newEmail.trim(),
+      otp: newEmailOtp,
+    });
+
+    isLoading = false;
+
+    if (error) {
+      toast.error(`Failed to change email: ${error.message}`);
+      return;
+    }
+
+    toast.success("Email address updated successfully");
+    resetForm();
+
+    // We need to reset everything because the session needs to update
+    // so that we get a new user state.
+    refreshAll();
+  };
+
+  const handleResendCurrentEmailOtp = async () => {
+    isLoading = true;
+
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
+      email: currentEmail,
+      type: "email-verification",
+    });
+
+    isLoading = false;
+
+    if (error) {
+      toast.error(`Failed to resend verification code: ${error.message}`);
+      return;
+    }
+
+    toast.success("Verification code resent to your current email");
+  };
+
+  const handleResendNewEmailOtp = async () => {
+    isLoading = true;
+
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
+      email: currentEmail,
+      type: "email-verification",
+    });
+
+    isLoading = false;
+
+    if (error) {
+      toast.error(`Failed to resend verification code: ${error.message}`);
+      return;
+    }
+
+    currentEmailOtp = "";
+    newEmailOtp = "";
+    step = "current-otp";
+    toast.info(
+      "Verify your current email again to resend a code to your new address."
+    );
   };
 </script>
 
 <ProfileSettingsSection
   title="Email address"
-  description="Change the email you use to sign in. We will send a verification link before the change takes effect."
+  description="Change the email you use to sign in. We will verify your current email first, then confirm the new one with a code."
 >
   {#snippet children()}
     <FieldGroup>
@@ -58,7 +191,47 @@
       </Field>
 
       {#if step === "idle"}
-        <form id="profile-email-form" onsubmit={handleSendVerification}>
+        <FieldDescription>
+          Start the process to receive a verification code at your current email
+          address.
+        </FieldDescription>
+      {:else if step === "current-otp"}
+        <div
+          class="border-border bg-muted/50 flex gap-3 rounded-lg border p-4"
+          role="status"
+        >
+          <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
+          <div class="space-y-1 text-sm">
+            <p class="font-medium">Check your current inbox</p>
+            <p class="text-muted-foreground">
+              We sent a verification code to
+              <span class="text-foreground font-medium">{currentEmail}</span>.
+              Enter it below to continue.
+            </p>
+          </div>
+        </div>
+
+        <form
+          id="profile-email-current-otp-form"
+          onsubmit={handleContinueToNewEmail}
+        >
+          <Field>
+            <FieldLabel for="current-email-otp-{id}">
+              Verification code
+            </FieldLabel>
+            <Input
+              id="current-email-otp-{id}"
+              name="currentEmailOtp"
+              bind:value={currentEmailOtp}
+              placeholder="Enter 6-digit code"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              required
+            />
+          </Field>
+        </form>
+      {:else if step === "new-email"}
+        <form id="profile-email-new-form" onsubmit={handleRequestNewEmail}>
           <Field>
             <FieldLabel for="new-email-{id}">New email address</FieldLabel>
             <Input
@@ -70,6 +243,9 @@
               autocomplete="email"
               required
             />
+            <FieldDescription>
+              We will send a verification code to this address.
+            </FieldDescription>
           </Field>
         </form>
       {:else}
@@ -79,31 +255,30 @@
         >
           <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
           <div class="space-y-1 text-sm">
-            <p class="font-medium">Check your inbox</p>
+            <p class="font-medium">Check your new inbox</p>
             <p class="text-muted-foreground">
-              We sent a verification link to
-              <span class="text-foreground font-medium">{newEmail}</span>. Open
-              the link or enter the code below to confirm your new email.
+              We sent a verification code to
+              <span class="text-foreground font-medium">{newEmail}</span>. Enter
+              it below to confirm your new email.
             </p>
           </div>
         </div>
 
-        <form id="profile-email-verify-form" onsubmit={handleConfirmEmail}>
+        <form
+          id="profile-email-verify-form"
+          onsubmit={handleConfirmEmailChange}
+        >
           <Field>
-            <FieldLabel for="verification-code-{id}">
-              Verification code
-            </FieldLabel>
+            <FieldLabel for="new-email-otp-{id}">Verification code</FieldLabel>
             <Input
-              id="verification-code-{id}"
-              name="verificationCode"
-              bind:value={verificationCode}
+              id="new-email-otp-{id}"
+              name="newEmailOtp"
+              bind:value={newEmailOtp}
               placeholder="Enter 6-digit code"
               inputmode="numeric"
               autocomplete="one-time-code"
+              required
             />
-            <FieldDescription>
-              Optional if you verified via the email link.
-            </FieldDescription>
           </Field>
         </form>
       {/if}
@@ -111,20 +286,65 @@
   {/snippet}
   {#snippet footer()}
     {#if step === "idle"}
-      <Button type="submit" form="profile-email-form">
-        Send verification email
+      <Button
+        type="button"
+        disabled={isLoading}
+        onclick={handleStartEmailChange}
+      >
+        Start email change
       </Button>
-    {:else}
+    {:else if step === "current-otp"}
       <div class="flex flex-wrap gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          onclick={handleCancelEmailChange}
-        >
+        <Button type="button" variant="outline" onclick={resetForm}>
           Cancel
         </Button>
-        <Button type="button" variant="ghost">Resend email</Button>
-        <Button type="submit" form="profile-email-verify-form">
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={isLoading}
+          onclick={handleResendCurrentEmailOtp}
+        >
+          Resend code
+        </Button>
+        <Button
+          type="submit"
+          form="profile-email-current-otp-form"
+          disabled={isLoading}
+        >
+          Continue
+        </Button>
+      </div>
+    {:else if step === "new-email"}
+      <div class="flex flex-wrap gap-2">
+        <Button type="button" variant="outline" onclick={resetForm}>
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          form="profile-email-new-form"
+          disabled={isLoading}
+        >
+          Send verification code
+        </Button>
+      </div>
+    {:else}
+      <div class="flex flex-wrap gap-2">
+        <Button type="button" variant="outline" onclick={resetForm}>
+          Cancel
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={isLoading}
+          onclick={handleResendNewEmailOtp}
+        >
+          Resend code
+        </Button>
+        <Button
+          type="submit"
+          form="profile-email-verify-form"
+          disabled={isLoading}
+        >
           Confirm new email
         </Button>
       </div>

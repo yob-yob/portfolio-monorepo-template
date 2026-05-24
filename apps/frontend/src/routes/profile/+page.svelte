@@ -31,4 +31,4 @@
 
 <ProfileDetailsForm {user} />
 <ProfilePasswordForm />
-<ProfileEmailForm />
+<ProfileEmailForm currentEmail={user.email} />
