@@ -3,4 +3,4 @@ alwaysApply: true
 ---
 Do NOT use motion-v, @vueuse/motion, framer-motion, or any animation library.
 Do NOT generate <motion.div>, <motion.span>, <motion.*> or import { motion }.
-Use plain HTML/Vue elements. If animation is needed, use CSS transitions or @keyframes.
+Use plain HTML/Svelte elements. If animation is needed, use CSS transitions or @keyframes.
