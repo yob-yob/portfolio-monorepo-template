@@ -34,7 +34,9 @@
     {#snippet children()}
       <Field>
         <div class="flex items-center gap-2">
-          <FieldLabel for="current-email-display-{id}">Email address</FieldLabel>
+          <FieldLabel for="current-email-display-{id}"
+            >Email address</FieldLabel
+          >
           {#if emailVerified}
             <BadgeCheckIcon
               class="text-primary size-4 shrink-0"

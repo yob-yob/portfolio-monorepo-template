@@ -9,21 +9,21 @@
   import ProfileSettingsSection from "./profile-settings-section.svelte";
 
   interface LinkedAccount {
-    id: string;
-    providerId: string;
     accountId: string;
     createdAt: Date | string;
-    updatedAt: Date | string;
+    id: string;
+    providerId: string;
     scopes: string[];
+    updatedAt: Date | string;
   }
 
   interface DisplayAccount {
-    id: string;
-    providerId: string;
-    label: string;
     detail: string | null;
-    linkedAt: string;
     icon: typeof KeyRoundIcon;
+    id: string;
+    label: string;
+    linkedAt: string;
+    providerId: string;
   }
 
   const PROVIDER_META: Record<
@@ -119,7 +119,8 @@
         {#if isLoading}
           Loading sign-in methods...
         {:else}
-          {accounts.length} connected account{accounts.length === 1 ? "" : "s"}
+          {accounts.length}
+          connected account{accounts.length === 1 ? "" : "s"}
         {/if}
       </p>
 
@@ -160,9 +161,13 @@
                     </span>
                   </div>
                   {#if account.detail}
-                    <p class="text-muted-foreground text-sm">{account.detail}</p>
+                    <p class="text-muted-foreground text-sm"
+                      >{account.detail}</p
+                    >
                   {/if}
-                  <p class="text-muted-foreground text-xs">{account.linkedAt}</p>
+                  <p class="text-muted-foreground text-xs"
+                    >{account.linkedAt}</p
+                  >
                 </div>
               </li>
             {/each}
