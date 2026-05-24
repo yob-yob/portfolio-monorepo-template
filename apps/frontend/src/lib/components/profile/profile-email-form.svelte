@@ -1,6 +1,4 @@
 <script lang="ts">
-  import BadgeCheckIcon from "@lucide/svelte/icons/badge-check";
-  import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import MailIcon from "@lucide/svelte/icons/mail";
   import { onDestroy } from "svelte";
   import { fade } from "svelte/transition";
@@ -25,9 +23,8 @@
 
   const id = $props.id();
 
-  const { currentEmail, emailVerified } = $props<{
+  const { currentEmail } = $props<{
     currentEmail: string;
-    emailVerified: boolean;
   }>();
 
   let step = $state<EmailChangeStep>("idle");
@@ -327,7 +324,7 @@
 </script>
 
 <ProfileSettingsSection
-  title="Email address"
+  title="Change email"
   description="Changing your email takes three steps: verify your current inbox, choose a new address, then confirm the new inbox."
 >
   {#snippet children()}
@@ -339,40 +336,6 @@
           : `${formBodyHeight}px`}
       >
         <div bind:this={formBodyRef} class="flex w-full flex-col gap-7">
-          <Field>
-            <div class="flex items-center gap-2">
-              <FieldLabel for="current-email-{id}">Current email</FieldLabel>
-              {#if emailVerified}
-                <BadgeCheckIcon
-                  class="text-primary size-4 shrink-0"
-                  aria-label="Email verified"
-                  title="Email verified"
-                />
-              {:else}
-                <CircleAlertIcon
-                  class="size-4 shrink-0 text-amber-600 dark:text-amber-500"
-                  aria-label="Email not verified"
-                />
-              {/if}
-            </div>
-            <Input
-              id="current-email-{id}"
-              type="email"
-              value={currentEmail}
-              disabled
-              class="bg-muted"
-            />
-            {#if step === "idle"}
-              <FieldDescription>
-                {#if emailVerified}
-                  This email is verified and used to sign in.
-                {:else}
-                  This email is not verified yet.
-                {/if}
-              </FieldDescription>
-            {/if}
-          </Field>
-
           {#if step === "new-otp"}
             <Field>
               <FieldLabel for="new-email-display-{id}"
@@ -395,8 +358,8 @@
             {#if step === "idle"}
               <div in:fade={{ duration: 180 }}>
                 <FieldDescription>
-                  We will email a code to your current address so you can confirm
-                  it is you before making a change.
+                  We will email a code to your current address so you can
+                  confirm it is you before making a change.
                 </FieldDescription>
               </div>
             {:else if step === "request-change"}
@@ -405,83 +368,83 @@
                   class="border-border bg-muted/50 flex gap-3 rounded-lg border p-4"
                   role="status"
                 >
-                <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
-                <div class="space-y-1 text-sm">
-                  <p class="font-medium">Step 2 of 3 — Confirm it is you</p>
-                  <p class="text-muted-foreground">
-                    We emailed a code to
-                    <span class="text-foreground font-medium"
-                      >{currentEmail}</span
-                    >. Enter that code below, then the address you want to use
-                    instead.
-                  </p>
+                  <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
+                  <div class="space-y-1 text-sm">
+                    <p class="font-medium">Step 2 of 3 — Confirm it is you</p>
+                    <p class="text-muted-foreground">
+                      We emailed a code to
+                      <span class="text-foreground font-medium"
+                        >{currentEmail}</span
+                      >. Enter that code below, then the address you want to use
+                      instead.
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <form
-                id="profile-email-request-form"
-                novalidate
-                onsubmit={handleRequestNewEmail}
-              >
-                <FieldGroup>
-                  <Field>
-                    <div class="flex items-center justify-between gap-3">
-                      <FieldLabel for="current-email-otp-{id}">
-                        Code from current email
-                      </FieldLabel>
-                      <Button
-                        type="button"
-                        variant="link"
-                        disabled={isLoading || isOtpResendOnCooldown}
-                        class={otpResendButtonClass}
-                        onclick={handleResendCurrentEmailOtp}
-                      >
-                        {#if isOtpResendOnCooldown}
-                          Request a new code ({formatOtpResendCooldown(
+                <form
+                  id="profile-email-request-form"
+                  novalidate
+                  onsubmit={handleRequestNewEmail}
+                >
+                  <FieldGroup>
+                    <Field>
+                      <div class="flex items-center justify-between gap-3">
+                        <FieldLabel for="current-email-otp-{id}">
+                          Code from current email
+                        </FieldLabel>
+                        <Button
+                          type="button"
+                          variant="link"
+                          disabled={isLoading || isOtpResendOnCooldown}
+                          class={otpResendButtonClass}
+                          onclick={handleResendCurrentEmailOtp}
+                        >
+                          {#if isOtpResendOnCooldown}
+                            Request a new code ({formatOtpResendCooldown(
                             otpResendCooldownRemaining
                           )})
-                        {:else}
-                          Request a new code
-                        {/if}
-                      </Button>
-                    </div>
-                    <Input
-                      id="current-email-otp-{id}"
-                      name="currentEmailOtp"
-                      type="text"
-                      bind:value={currentEmailOtp}
-                      oninput={handleCurrentEmailOtpInput}
-                      placeholder="Enter 6-digit code"
-                      inputmode="numeric"
-                      autocomplete="one-time-code"
-                      maxlength={6}
-                      aria-invalid={currentEmailOtpError ? true : undefined}
-                      required
-                    />
-                    {#if currentEmailOtpError}
-                      <FieldError>{currentEmailOtpError}</FieldError>
-                    {/if}
-                  </Field>
-                  <Field>
-                    <FieldLabel for="new-email-{id}"
-                      >New email address</FieldLabel
-                    >
-                    <Input
-                      id="new-email-{id}"
-                      name="newEmail"
-                      type="email"
-                      bind:value={newEmail}
-                      placeholder="you@example.com"
-                      autocomplete="email"
-                      required
-                    />
-                    <FieldDescription>
-                      After you continue, we will email a code to this address
-                      for the final confirmation step.
-                    </FieldDescription>
-                  </Field>
-                </FieldGroup>
-              </form>
+                          {:else}
+                            Request a new code
+                          {/if}
+                        </Button>
+                      </div>
+                      <Input
+                        id="current-email-otp-{id}"
+                        name="currentEmailOtp"
+                        type="text"
+                        bind:value={currentEmailOtp}
+                        oninput={handleCurrentEmailOtpInput}
+                        placeholder="Enter 6-digit code"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        maxlength={6}
+                        aria-invalid={currentEmailOtpError ? true : undefined}
+                        required
+                      />
+                      {#if currentEmailOtpError}
+                        <FieldError>{currentEmailOtpError}</FieldError>
+                      {/if}
+                    </Field>
+                    <Field>
+                      <FieldLabel for="new-email-{id}"
+                        >New email address</FieldLabel
+                      >
+                      <Input
+                        id="new-email-{id}"
+                        name="newEmail"
+                        type="email"
+                        bind:value={newEmail}
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                      />
+                      <FieldDescription>
+                        After you continue, we will email a code to this address
+                        for the final confirmation step.
+                      </FieldDescription>
+                    </Field>
+                  </FieldGroup>
+                </form>
               </div>
             {:else}
               <div in:fade={{ duration: 180 }} class="flex flex-col gap-4">
@@ -489,55 +452,56 @@
                   class="border-border bg-muted/50 flex gap-3 rounded-lg border p-4"
                   role="status"
                 >
-                <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
-                <div class="space-y-1 text-sm">
-                  <p class="font-medium"
-                    >Step 3 of 3 — Confirm your new email</p
-                  >
-                  <p class="text-muted-foreground">
-                    We emailed a code to
-                    <span class="text-foreground font-medium">{newEmail}</span>.
-                    Enter it below to finish changing your email.
-                  </p>
-                </div>
-              </div>
-
-              <form
-                id="profile-email-verify-form"
-                onsubmit={handleConfirmEmailChange}
-              >
-                <Field>
-                  <div class="flex items-center justify-between gap-3">
-                    <FieldLabel for="new-email-otp-{id}">
-                      Code from new email
-                    </FieldLabel>
-                    <Button
-                      type="button"
-                      variant="link"
-                      disabled={isLoading || isOtpResendOnCooldown}
-                      class={otpResendButtonClass}
-                      onclick={handleResendNewEmailOtp}
+                  <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
+                  <div class="space-y-1 text-sm">
+                    <p class="font-medium"
+                      >Step 3 of 3 — Confirm your new email</p
                     >
-                      {#if isOtpResendOnCooldown}
-                        Request a new code ({formatOtpResendCooldown(
+                    <p class="text-muted-foreground">
+                      We emailed a code to
+                      <span class="text-foreground font-medium"
+                        >{newEmail}</span
+                      >. Enter it below to finish changing your email.
+                    </p>
+                  </div>
+                </div>
+
+                <form
+                  id="profile-email-verify-form"
+                  onsubmit={handleConfirmEmailChange}
+                >
+                  <Field>
+                    <div class="flex items-center justify-between gap-3">
+                      <FieldLabel for="new-email-otp-{id}">
+                        Code from new email
+                      </FieldLabel>
+                      <Button
+                        type="button"
+                        variant="link"
+                        disabled={isLoading || isOtpResendOnCooldown}
+                        class={otpResendButtonClass}
+                        onclick={handleResendNewEmailOtp}
+                      >
+                        {#if isOtpResendOnCooldown}
+                          Request a new code ({formatOtpResendCooldown(
                           otpResendCooldownRemaining
                         )})
-                      {:else}
-                        Request a new code
-                      {/if}
-                    </Button>
-                  </div>
-                  <Input
-                    id="new-email-otp-{id}"
-                    name="newEmailOtp"
-                    bind:value={newEmailOtp}
-                    placeholder="Enter 6-digit code"
-                    inputmode="numeric"
-                    autocomplete="one-time-code"
-                    required
-                  />
-                </Field>
-              </form>
+                        {:else}
+                          Request a new code
+                        {/if}
+                      </Button>
+                    </div>
+                    <Input
+                      id="new-email-otp-{id}"
+                      name="newEmailOtp"
+                      bind:value={newEmailOtp}
+                      placeholder="Enter 6-digit code"
+                      inputmode="numeric"
+                      autocomplete="one-time-code"
+                      required
+                    />
+                  </Field>
+                </form>
               </div>
             {/if}
           </div>
@@ -557,7 +521,7 @@
             disabled={isLoading}
             onclick={handleStartEmailChange}
           >
-            Start email change
+            Change Email
           </Button>
         {:else if step === "request-change"}
           <div class="flex flex-wrap gap-2">

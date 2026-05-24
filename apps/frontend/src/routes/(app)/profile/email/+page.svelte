@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import ProfileDetailsForm from "$lib/components/profile/profile-details-form.svelte";
-  import ProfilePasswordForm from "$lib/components/profile/profile-password-form.svelte";
+  import ProfileChangeEmail from "$lib/components/profile/profile-change-email.svelte";
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
 
   const { data } = $props();
@@ -11,12 +10,19 @@
       href: "/profile",
       label: "Profile",
     });
+    const emailCrumb = breadcrumbs.addCrumb({
+      href: "/profile/email",
+      label: "Email address",
+    });
 
     return () => {
+      breadcrumbs.removeCrumb(emailCrumb);
       breadcrumbs.removeCrumb(profileCrumb);
     };
   });
 </script>
 
-<ProfileDetailsForm user={data.user} />
-<ProfilePasswordForm />
+<ProfileChangeEmail
+  currentEmail={data.user.email}
+  emailVerified={data.user.emailVerified}
+/>

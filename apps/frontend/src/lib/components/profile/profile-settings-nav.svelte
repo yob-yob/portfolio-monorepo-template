@@ -1,5 +1,6 @@
 <script lang="ts">
   import AlertTriangleIcon from "@lucide/svelte/icons/alert-triangle";
+  import MailIcon from "@lucide/svelte/icons/mail";
   import MonitorSmartphoneIcon from "@lucide/svelte/icons/monitor-smartphone";
   import UserRoundIcon from "@lucide/svelte/icons/user-round";
   import { page } from "$app/state";
@@ -10,10 +11,17 @@
     {
       href: "/profile",
       label: "General",
-      description: "Profile, password, and email",
+      description: "Profile and password",
       icon: UserRoundIcon,
       match: (pathname: string) =>
         pathname === "/profile" || pathname === "/profile/",
+    },
+    {
+      href: "/profile/email",
+      label: "Email address",
+      description: "Change your sign-in email",
+      icon: MailIcon,
+      match: (pathname: string) => pathname.startsWith("/profile/email"),
     },
     {
       href: "/profile/sessions",
