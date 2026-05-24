@@ -53,7 +53,7 @@
       return;
     }
 
-    toast.success("Verification code sent to your current email");
+    toast.success(`Verification code sent to ${currentEmail}`);
     step = "request-change";
   };
 
@@ -61,7 +61,7 @@
     event.preventDefault();
 
     if (!currentEmailOtp.trim()) {
-      toast.warning("Enter the verification code from your current email");
+      toast.warning("Enter the code from your current email");
       return;
     }
 
@@ -87,11 +87,11 @@
     isLoading = false;
 
     if (error) {
-      toast.error(`Failed to send verification code: ${error.message}`);
+      toast.error(`Could not send code to your new email: ${error.message}`);
       return;
     }
 
-    toast.success("Verification code sent to your new email");
+    toast.success(`Verification code sent to ${newEmail.trim()}`);
     step = "new-otp";
   };
 
@@ -99,7 +99,7 @@
     event.preventDefault();
 
     if (!newEmailOtp.trim()) {
-      toast.warning("Enter the verification code from your new email");
+      toast.warning("Enter the code from your new email");
       return;
     }
 
@@ -138,7 +138,7 @@
     }
 
     currentEmailOtp = "";
-    toast.success("Verification code resent to your current email");
+    toast.success(`Verification code resent to ${currentEmail}`);
   };
 
   const handleResendNewEmailOtp = async () => {
@@ -160,14 +160,14 @@
     newEmailOtp = "";
     step = "request-change";
     toast.info(
-      "Enter your current email code and new address again to resend a code to your new email."
+      `Re-enter the code from ${currentEmail} and your new address to resend a code to your new email.`
     );
   };
 </script>
 
 <ProfileSettingsSection
   title="Email address"
-  description="Change the email you use to sign in. We will verify your current email first, then confirm the new one with a code."
+  description="Changing your email takes three steps: verify your current inbox, choose a new address, then confirm the new inbox."
 >
   {#snippet children()}
     <FieldGroup>
@@ -205,8 +205,8 @@
 
       {#if step === "idle"}
         <FieldDescription>
-          Start the process to receive a verification code at your current email
-          address.
+          We will email a code to your current address so you can confirm it is
+          you before making a change.
         </FieldDescription>
       {:else if step === "request-change"}
         <div
@@ -215,11 +215,11 @@
         >
           <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
           <div class="space-y-1 text-sm">
-            <p class="font-medium">Verify your current email</p>
+            <p class="font-medium">Step 2 of 3 — Confirm it is you</p>
             <p class="text-muted-foreground">
-              We sent a verification code to
+              We emailed a code to
               <span class="text-foreground font-medium">{currentEmail}</span>.
-              Enter that code and your new email address below.
+              Enter that code below, then the address you want to use instead.
             </p>
           </div>
         </div>
@@ -228,7 +228,7 @@
           <FieldGroup>
             <Field>
               <FieldLabel for="current-email-otp-{id}">
-                Current email verification code
+                Code from current email
               </FieldLabel>
               <Input
                 id="current-email-otp-{id}"
@@ -252,8 +252,8 @@
                 required
               />
               <FieldDescription>
-                We will send a verification code to this address after your
-                current email is verified.
+                After you continue, we will email a code to this address for the
+                final confirmation step.
               </FieldDescription>
             </Field>
           </FieldGroup>
@@ -265,11 +265,11 @@
         >
           <MailIcon class="text-primary mt-0.5 size-5 shrink-0" />
           <div class="space-y-1 text-sm">
-            <p class="font-medium">Check your new inbox</p>
+            <p class="font-medium">Step 3 of 3 — Confirm your new email</p>
             <p class="text-muted-foreground">
-              We sent a verification code to
-              <span class="text-foreground font-medium">{newEmail}</span>. Enter
-              it below to confirm your new email.
+              We emailed a code to
+              <span class="text-foreground font-medium">{newEmail}</span>.
+              Enter it below to finish changing your email.
             </p>
           </div>
         </div>
@@ -279,7 +279,9 @@
           onsubmit={handleConfirmEmailChange}
         >
           <Field>
-            <FieldLabel for="new-email-otp-{id}">Verification code</FieldLabel>
+            <FieldLabel for="new-email-otp-{id}">
+              Code from new email
+            </FieldLabel>
             <Input
               id="new-email-otp-{id}"
               name="newEmailOtp"
@@ -314,14 +316,14 @@
           disabled={isLoading}
           onclick={handleResendCurrentEmailOtp}
         >
-          Resend code
+          Resend code to current email
         </Button>
         <Button
           type="submit"
           form="profile-email-request-form"
           disabled={isLoading}
         >
-          Send verification code
+          Send code to new email
         </Button>
       </div>
     {:else}
@@ -335,7 +337,7 @@
           disabled={isLoading}
           onclick={handleResendNewEmailOtp}
         >
-          Resend code
+          Resend code to new email
         </Button>
         <Button
           type="submit"
