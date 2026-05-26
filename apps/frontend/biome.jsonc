@@ -1,5 +1,13 @@
 {
   "extends": "//",
+  "files": {
+    "includes": [
+      "src/**/*.svelte",
+      "src/**/*.ts",
+      "!src/lib/components/ui/**/*.svelte",
+      "!src/lib/components/ui/**/*.ts"
+    ]
+  },
   "linter": {
     "rules": {
       "correctness": {

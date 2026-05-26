@@ -3,16 +3,15 @@
 import type { Session } from "@city-os/auth/client";
 
 declare global {
+  // biome-ignore lint/style/noNamespace: SvelteKit
   namespace App {
     // interface Error {}
     interface Locals {
-      user: Session['user'] | null;
-      session: Session['session'] | null;
+      session: Session["session"] | null;
+      user: Session["user"] | null;
     }
     // interface PageData {}
     // interface PageState {}
     // interface Platform {}
   }
 }
-
-export {};

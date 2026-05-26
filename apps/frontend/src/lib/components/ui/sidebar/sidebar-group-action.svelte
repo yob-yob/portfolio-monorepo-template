@@ -15,7 +15,7 @@
 
   const mergedProps = $derived({
     class: cn(
-      "absolute top-3.5 right-3 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-hidden ring-sidebar-ring transition-transform after:absolute after:-inset-2 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 group-data-[collapsible=icon]:hidden md:after:hidden [&>svg]:size-4 [&>svg]:shrink-0",
+      "text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground absolute top-3.5 right-3 w-5 rounded-md p-0 focus-visible:ring-2 [&>svg]:size-4 flex aspect-square items-center justify-center outline-hidden transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0",
       className
     ),
     "data-slot": "sidebar-group-action",
@@ -27,7 +27,5 @@
 {#if child}
   {@render child({ props: mergedProps })}
 {:else}
-  <button bind:this={ref} type="button" {...mergedProps}>
-    {@render children?.()}
-  </button>
+  <button bind:this={ref} {...mergedProps}> {@render children?.()} </button>
 {/if}

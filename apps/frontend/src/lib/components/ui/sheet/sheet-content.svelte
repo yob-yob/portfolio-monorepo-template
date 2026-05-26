@@ -45,7 +45,7 @@
         {#snippet child({ props })}
           <Button
             variant="ghost"
-            class="absolute top-4 right-4"
+            class="absolute top-3 right-3"
             size="icon-sm"
             {...props}
           >
