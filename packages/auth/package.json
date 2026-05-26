@@ -1,5 +1,5 @@
 {
-  "name": "@asset-tracking/auth",
+  "name": "@city-os/auth",
   "exports": {
     "./server": "./src/auth.ts",
     "./client": "./src/auth-client.ts"
@@ -8,8 +8,8 @@
     "schema:generate": "bun x auth@latest generate --config ./src/auth.ts --output=../database/src/schemas/auth.ts"
   },
   "dependencies": {
-    "@asset-tracking/mailer": "workspace:*",
-    "@asset-tracking/database": "workspace:*",
+    "@city-os/mailer": "workspace:*",
+    "@city-os/database": "workspace:*",
     "@better-auth/redis-storage": "^1.6.11",
     "@paralleldrive/cuid2": "^3.3.0",
     "better-auth": "^1.6.11",

@@ -1,7 +1,7 @@
-import { db } from "@asset-tracking/database/node/db";
-// biome-ignore lint/performance/noNamespaceImport: Importing All Tables from Auth Schema is what we need anyways...
-import * as authSchema from "@asset-tracking/database/schemas/auth";
 import { redisStorage } from "@better-auth/redis-storage";
+import { db } from "@city-os/database/node/db";
+// biome-ignore lint/performance/noNamespaceImport: Importing All Tables from Auth Schema is what we need anyways...
+import * as authSchema from "@city-os/database/schemas/auth";
 import { createId } from "@paralleldrive/cuid2";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
@@ -33,7 +33,7 @@ export default betterAuth({
   deferSessionRefresh: true,
   secondaryStorage: redisStorage({
     client: redis,
-    keyPrefix: "asset-tracking:auth:",
+    keyPrefix: "city-os:auth:",
   }),
   baseURL: {
     allowedHosts: ["http://localhost:*"],

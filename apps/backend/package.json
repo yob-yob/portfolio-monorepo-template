@@ -1,5 +1,5 @@
 {
-  "name": "@asset-tracking/backend",
+  "name": "@city-os/backend",
   "version": "1.0.0",
   "exports": {
     "./app": "./src/app.ts"
@@ -12,8 +12,8 @@
     "serve": "dist/backend_server"
   },
   "dependencies": {
-    "@asset-tracking/auth": "workspace:*",
-    "@asset-tracking/database": "workspace:*",
+    "@city-os/auth": "workspace:*",
+    "@city-os/database": "workspace:*",
     "@elysia/cors": "^1.4.2",
     "@elysia/openapi": "^1.4.15",
     "@elysia/static": "^1.4.11",

@@ -1,4 +1,4 @@
-import { nodemailer_transporter } from "@asset-tracking/mailer/transporter";
+import { nodemailer_transporter } from "@city-os/mailer/transporter";
 import { emailOTP } from "better-auth/plugins";
 
 export const emailOtpPlugin = emailOTP({

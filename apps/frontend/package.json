@@ -1,5 +1,5 @@
 {
-  "name": "@asset-tracking/frontend",
+  "name": "@city-os/frontend",
   "type": "module",
   "version": "0.0.1",
   "private": true,
@@ -13,8 +13,8 @@
     "serve": "bun run build/index.js"
   },
   "dependencies": {
-    "@asset-tracking/auth": "workspace:*",
-    "@asset-tracking/backend": "workspace:*",
+    "@city-os/auth": "workspace:*",
+    "@city-os/backend": "workspace:*",
     "@elysia/eden": "latest",
     "@fontsource-variable/inter": "^5.2.8",
     "@internationalized/date": "^3.12.0",

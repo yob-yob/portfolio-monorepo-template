@@ -1,6 +1,6 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
-import type { Session } from "@asset-tracking/auth/client";
+import type { Session } from "@city-os/auth/client";
 
 declare global {
   namespace App {

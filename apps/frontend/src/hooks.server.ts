@@ -1,4 +1,4 @@
-import { authClient } from "@asset-tracking/auth/client";
+import { authClient } from "@city-os/auth/client";
 
 export async function handle({ event, resolve }) {
   // Fetch current session from Better Auth

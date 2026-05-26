@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { authClient } from "@asset-tracking/auth/client";
+  import { authClient } from "@city-os/auth/client";
   import type { HTMLAttributes } from "svelte/elements";
   import loginBanner from "$lib/assets/login-banner.svg";
   import { Button } from "$lib/components/ui/button/index.js";

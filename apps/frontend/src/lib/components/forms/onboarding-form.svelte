@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { User } from "@asset-tracking/auth/client";
+  import type { User } from "@city-os/auth/client";
   import { randCompanyName } from "@ngneat/falso";
   import type { HTMLAttributes } from "svelte/elements";
   import { authClient } from "@/auth/client";

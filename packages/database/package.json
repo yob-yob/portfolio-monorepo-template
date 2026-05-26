@@ -1,5 +1,5 @@
 {
-  "name": "@asset-tracking/database",
+  "name": "@city-os/database",
   "exports": {
     "./schemas/*": "./src/schemas/*.ts",
     "./db": "./src/db.ts",

@@ -1,5 +1,5 @@
-import { db } from "@asset-tracking/database/db";
-import { users } from "@asset-tracking/database/schemas/auth";
+import { db } from "@city-os/database/db";
+import { users } from "@city-os/database/schemas/auth";
 import type { HealthModel } from "./model.ts";
 
 export const HealthService = {

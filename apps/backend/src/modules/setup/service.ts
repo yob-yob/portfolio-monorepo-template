@@ -1,6 +1,6 @@
-import auth from "@asset-tracking/auth/server";
-import { db } from "@asset-tracking/database/db";
-import { users } from "@asset-tracking/database/schemas/auth";
+import auth from "@city-os/auth/server";
+import { db } from "@city-os/database/db";
+import { users } from "@city-os/database/schemas/auth";
 import { status } from "elysia";
 import type { SetupModel } from "./model.ts";
 

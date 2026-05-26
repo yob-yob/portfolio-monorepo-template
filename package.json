@@ -1,5 +1,5 @@
 {
-  "name": "asset-tracking",
+  "name": "city-os",
   "module": "index.ts",
   "type": "module",
   "private": true,

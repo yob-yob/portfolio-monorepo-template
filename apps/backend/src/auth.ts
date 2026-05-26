@@ -1,4 +1,4 @@
-import auth from "@asset-tracking/auth/server";
+import auth from "@city-os/auth/server";
 import Elysia from "elysia";
 
 // user middleware (compute user and session and pass to routes)

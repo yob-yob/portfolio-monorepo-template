@@ -1,5 +1,5 @@
 {
-  "name": "@asset-tracking/mailer",
+  "name": "@city-os/mailer",
   "exports": {
     "./transporter": "./src/index.ts"
   },
