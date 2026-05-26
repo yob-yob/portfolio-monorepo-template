@@ -6,4 +6,5 @@ export const authClient = createAuthClient({
   plugins: [organizationClient(), emailOTPClient()],
 });
 
-export type { Session, User } from "better-auth/types";
+export type Session = typeof authClient.$Infer.Session;
+export type User = Session["user"];

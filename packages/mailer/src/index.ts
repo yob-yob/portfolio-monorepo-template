@@ -17,11 +17,11 @@ if (Number.isNaN(SMTP_PORT)) {
 }
 
 if (!SMTP_USERNAME) {
-  console.log("SMTP_USERNAME is not set");
+  console.warn("SMTP_USERNAME is not set");
 }
 
 if (!SMTP_PASSWORD) {
-  console.log("SMTP_PASSWORD is not set");
+  console.warn("SMTP_PASSWORD is not set");
 }
 
 export const nodemailer_transporter = createTransport({
@@ -36,5 +36,5 @@ export const nodemailer_transporter = createTransport({
 
 nodemailer_transporter
   .verify()
-  .then(() => console.log("Server is ready to take our messages"))
+  .then(() => console.info("Server is ready to take our messages"))
   .catch((err) => console.error("Verification failed:", err));

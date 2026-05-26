@@ -5,9 +5,10 @@ import { redisStorage } from "@better-auth/redis-storage";
 import { createId } from "@paralleldrive/cuid2";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
-import { openAPI, organization } from "better-auth/plugins";
+import { openAPI } from "better-auth/plugins";
 import { Redis } from "ioredis";
-import { emailOtpPluginConfiguration } from "./plugins/mail-otp.ts";
+import { emailOtpPlugin } from "./plugins/mail-otp.ts";
+import { organizationPlugin } from "./plugins/organization.ts";
 
 if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set");
@@ -39,7 +40,7 @@ export default betterAuth({
     fallback: "http://localhost:3000",
   },
   basePath: "/",
-  plugins: [openAPI(), organization(), emailOtpPluginConfiguration],
+  plugins: [openAPI(), organizationPlugin, emailOtpPlugin],
   emailAndPassword: { enabled: true },
   secret: process.env.BETTER_AUTH_SECRET,
   advanced: {

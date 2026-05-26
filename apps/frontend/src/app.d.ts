@@ -1,13 +1,13 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
-import type { Session, User } from "@asset-tracking/auth/client";
+import type { Session } from "@asset-tracking/auth/client";
 
 declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      user: User | null;
-      session: Session | null;
+      user: Session['user'] | null;
+      session: Session['session'] | null;
     }
     // interface PageData {}
     // interface PageState {}

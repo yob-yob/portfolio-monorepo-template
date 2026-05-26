@@ -1,32 +1,11 @@
 <script lang="ts" module>
-  import AudioWaveformIcon from "@lucide/svelte/icons/audio-waveform";
   import BookOpenIcon from "@lucide/svelte/icons/book-open";
   import BotIcon from "@lucide/svelte/icons/bot";
   import ChartPieIcon from "@lucide/svelte/icons/chart-pie";
-  import CommandIcon from "@lucide/svelte/icons/command";
   import FrameIcon from "@lucide/svelte/icons/frame";
-  import GalleryVerticalEndIcon from "@lucide/svelte/icons/gallery-vertical-end";
   import MapIcon from "@lucide/svelte/icons/map";
   import Settings2Icon from "@lucide/svelte/icons/settings-2";
   import SquareTerminalIcon from "@lucide/svelte/icons/square-terminal";
-
-  const teams = [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEndIcon,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveformIcon,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: CommandIcon,
-      plan: "Free",
-    },
-  ];
 
   const navMain = [
     {
@@ -137,6 +116,7 @@
 
 <script lang="ts">
   import { type ComponentProps } from "svelte";
+  import { authClient } from "@/auth/client";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import NavMain from "./nav-main.svelte";
   import NavProjects from "./nav-projects.svelte";
@@ -155,11 +135,25 @@
     user = $bindable<User>(),
     ...restProps
   }: ComponentProps<typeof Sidebar.Root> & { user: User } = $props();
+
+  const organizations = authClient.useListOrganizations();
 </script>
 
 <Sidebar.Root bind:ref {collapsible} {...restProps}>
   <Sidebar.Header>
-    <TeamSwitcher {teams} />
+    {#if $organizations.isPending}
+      <p>Loading...</p>
+    {:else if $organizations.data && $organizations.data.length > 0}
+      <TeamSwitcher
+        teams={$organizations.data.map((org) => ({
+        name: org.name,
+        logo: org.logo,
+        plan: "",
+      }))}
+      />
+    {:else}
+      ERROR... No Organization.
+    {/if}
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={navMain} />

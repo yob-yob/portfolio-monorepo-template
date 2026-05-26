@@ -10,7 +10,10 @@ export async function handle({ event, resolve }) {
 
   if (session?.data) {
     event.locals.user = session.data.user;
-    event.locals.session = session.data.session;
+    event.locals.session = {
+      ...session.data.session,
+      activeOrganizationId: session.data.session.activeOrganizationId ?? null,
+    };
   } else {
     event.locals.user = null;
     event.locals.session = null;

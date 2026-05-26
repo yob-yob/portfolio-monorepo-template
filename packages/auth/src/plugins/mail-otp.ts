@@ -1,7 +1,7 @@
 import { nodemailer_transporter } from "@asset-tracking/mailer/transporter";
 import { emailOTP } from "better-auth/plugins";
 
-export const emailOtpPluginConfiguration = emailOTP({
+export const emailOtpPlugin = emailOTP({
   async sendVerificationOTP({ email, otp, type }) {
     await nodemailer_transporter.sendMail({
       from: '"Your App Name" <your-email@gmail.com>',

@@ -114,8 +114,6 @@
     session: Session,
     currentToken: string | undefined
   ): DisplaySession => {
-    console.log(session.token, currentToken);
-
     const isCurrent = session.token === currentToken;
     const { device, browser, icon } = parseUserAgent(session.userAgent);
 
