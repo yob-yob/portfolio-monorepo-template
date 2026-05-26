@@ -41,28 +41,6 @@
           }
         }
       }
-    },
-    {
-      "includes": [
-        "src/lib/components/ui/**/*.svelte",
-        "src/lib/components/ui/**/*.ts"
-      ],
-      "linter": {
-        "rules": {
-          "nursery": {
-            "useSortedClasses": "off"
-          },
-          "style": {
-            "noExportedImports": "off"
-          },
-          "complexity": {
-            "noCommaOperator": "off"
-          },
-          "suspicious": {
-            "noAssignInExpressions": "off"
-          }
-        }
-      }
     }
   ],
   "css": {
