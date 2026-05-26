@@ -72,9 +72,9 @@
             <BadgeCheckIcon />
             Account
           </DropdownMenu.Item>
-          <DropdownMenu.Item>
+          <DropdownMenu.Item onSelect={() => goto('/select-organization')}>
             <CreditCardIcon />
-            Billing
+            Change organization
           </DropdownMenu.Item>
           <DropdownMenu.Item>
             <BellIcon />

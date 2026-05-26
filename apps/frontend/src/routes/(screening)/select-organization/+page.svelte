@@ -1,16 +1,33 @@
 <script lang="ts">
   import { authClient } from "@/auth/client";
-  import { invalidateAll } from "$app/navigation";
+  import { goto, invalidateAll } from "$app/navigation";
   import DarkModeToggle from "$lib/components/dark-mode-toggle.svelte";
 
   const organizations = authClient.useListOrganizations();
   let activatingOrganizationId = $state<string | null>(null);
+
+  organizations.subscribe(({ data, error }) => {
+    if (error) {
+      // ERROR!!!
+      return;
+    }
+
+    if (data && data.length === 0) {
+      goto("/onboarding");
+    } else if (data && data.length === 1) {
+      const OnlyOrg = data[0];
+      if (OnlyOrg) {
+        activeOrganization(OnlyOrg.id);
+      }
+    }
+  });
 
   const activeOrganization = async (organizationId: string) => {
     activatingOrganizationId = organizationId;
     try {
       await authClient.organization.setActive({ organizationId });
       await invalidateAll();
+      goto("/");
     } finally {
       activatingOrganizationId = null;
     }
@@ -43,7 +60,9 @@
     </div>
   {:else if !$organizations.data?.length}
     <div class="w-full max-w-sm md:max-w-3xl">
-      <div class="bg-card text-card-foreground rounded-xl border p-6 text-center shadow-sm">
+      <div
+        class="bg-card text-card-foreground rounded-xl border p-6 text-center shadow-sm"
+      >
         <p class="font-semibold">No organizations found</p>
         <p class="text-muted-foreground mt-1 text-sm">
           You do not have access to any organizations yet.
@@ -52,7 +71,9 @@
     </div>
   {:else}
     <div class="w-full max-w-sm space-y-3 md:max-w-3xl">
-      <h1 class="text-2xl font-semibold tracking-tight">Select an organization</h1>
+      <h1 class="text-2xl font-semibold tracking-tight"
+        >Select an organization</h1
+      >
       <p class="text-muted-foreground text-sm">
         Click an organization to continue.
       </p>

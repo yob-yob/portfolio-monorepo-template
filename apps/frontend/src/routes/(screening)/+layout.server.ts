@@ -5,10 +5,6 @@ export const load = ({ locals }) => {
     redirect(307, "/auth/login");
   }
 
-  if (locals.session.activeOrganizationId) {
-    redirect(307, "/");
-  }
-
   return {
     user: locals.user,
     session: locals.session,

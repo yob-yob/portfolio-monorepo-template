@@ -3,7 +3,14 @@ import { createAuthClient } from "better-auth/svelte";
 
 export const authClient = createAuthClient({
   baseURL: "http://localhost:3000",
-  plugins: [organizationClient(), emailOTPClient()],
+  plugins: [
+    organizationClient({
+      teams: {
+        enabled: true,
+      },
+    }),
+    emailOTPClient(),
+  ],
 });
 
 export type Session = typeof authClient.$Infer.Session;

@@ -115,7 +115,8 @@
 </script>
 
 <script lang="ts">
-  import { type ComponentProps } from "svelte";
+  import type { User } from "@city-os/auth/client";
+  import { type ComponentProps, onMount } from "svelte";
   import { authClient } from "@/auth/client";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import NavMain from "./nav-main.svelte";
@@ -123,37 +124,31 @@
   import NavUser from "./nav-user.svelte";
   import TeamSwitcher from "./team-switcher.svelte";
 
-  interface User {
-    email: string;
-    image?: string | null;
-    name: string;
-  }
-
   let {
     ref = $bindable(null),
     collapsible = "icon",
     user = $bindable<User>(),
     ...restProps
-  }: ComponentProps<typeof Sidebar.Root> & { user: User } = $props();
+  }: ComponentProps<typeof Sidebar.Root> & {
+    user: User;
+  } = $props();
 
-  const organizations = authClient.useListOrganizations();
+  const teams = authClient.organization.listTeams();
 </script>
 
 <Sidebar.Root bind:ref {collapsible} {...restProps}>
   <Sidebar.Header>
-    {#if $organizations.isPending}
-      <p>Loading...</p>
-    {:else if $organizations.data && $organizations.data.length > 0}
-      <TeamSwitcher
-        teams={$organizations.data.map((org) => ({
-        name: org.name,
-        logo: org.logo,
-        plan: "",
-      }))}
-      />
-    {:else}
-      ERROR... No Organization.
-    {/if}
+    {#await teams then {data}}
+      {#if data}
+        <TeamSwitcher
+          teams={data.map((team) => ({
+            name: team.name,
+            logo: "",
+            plan: "",
+          }))}
+        />
+      {/if}
+    {/await}
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={navMain} />
