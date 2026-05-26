@@ -7,7 +7,7 @@ export const load = ({ locals }) => {
 
   if (!locals.session.activeOrganizationId) {
     // Redirect to organization selection page
-    redirect(307, "/onboarding");
+    redirect(307, "/select-organization");
   }
 
   return {
