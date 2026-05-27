@@ -102,25 +102,31 @@
           },
         });
 
+        const fakeMemberDetails = {
+          id: organization.id,
+          name: organization.name,
+          slug: organization.slug,
+          role: "Error: Unknown role!",
+          memberSince: "Error: Date unavailable!",
+          isActive: organization.id === activeOrganizationId,
+        };
+
         if (error) {
-          return {
-            id: organization.id,
-            name: organization.name,
-            slug: organization.slug,
-            role: "Unknown role",
-            memberSince: "A member since: Date unavailable",
-            isActive: organization.id === activeOrganizationId,
-          };
+          return fakeMemberDetails;
         }
 
-        const member = data?.members?.[0];
+        const member = data.members[0];
+
+        if (!member) {
+          return fakeMemberDetails;
+        }
 
         return {
           id: organization.id,
           name: organization.name,
           slug: organization.slug,
-          role: formatRole(member?.role),
-          memberSince: formatMemberSince(member?.createdAt),
+          role: formatRole(member.role),
+          memberSince: formatMemberSince(member.createdAt),
           isActive: organization.id === activeOrganizationId,
         };
       })
