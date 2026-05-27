@@ -133,7 +133,13 @@
     user: User;
   } = $props();
 
-  const teams = authClient.organization.listTeams();
+  const sessionStore = authClient.useSession();
+
+  let teams = $state(authClient.organization.listTeams());
+
+  sessionStore.subscribe(() => {
+    teams = authClient.organization.listTeams();
+  });
 </script>
 
 <Sidebar.Root bind:ref {collapsible} {...restProps}>

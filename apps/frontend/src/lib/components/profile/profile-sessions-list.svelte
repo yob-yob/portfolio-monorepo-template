@@ -111,7 +111,7 @@
   };
 
   const toDisplaySession = (
-    session: Session,
+    session: Session["session"],
     currentToken: string | undefined
   ): DisplaySession => {
     const isCurrent = session.token === currentToken;
