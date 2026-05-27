@@ -1,105 +1,257 @@
 <script lang="ts">
+  import BuildingIcon from "@lucide/svelte/icons/building";
+  import { onMount } from "svelte";
+  import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
-  import { goto, invalidateAll } from "$app/navigation";
+  import { invalidateAll } from "$app/navigation";
+  import { Button } from "$lib/components/ui/button/index.js";
+  import * as Card from "$lib/components/ui/card/index.js";
+  import { Skeleton } from "$lib/components/ui/skeleton/index.js";
+  import ProfileSettingsSection from "./profile-settings-section.svelte";
 
-  const organizations = authClient.useListOrganizations();
+  interface DisplayOrganization {
+    id: string;
+    isActive: boolean;
+    memberSince: string;
+    name: string;
+    role: string;
+    slug: string;
+  }
+
+  const organizationsStore = authClient.useListOrganizations();
+  const sessionStore = authClient.useSession();
+
+  let displayOrganizations = $state<DisplayOrganization[]>([]);
+  let isLoading = $state(true);
   let activatingOrganizationId = $state<string | null>(null);
 
-  organizations.subscribe(({ data, error }) => {
-    if (error) {
-      // ERROR!!!
+  const formatMemberSince = (
+    createdAt: Date | string | null | undefined
+  ): string => {
+    if (!createdAt) {
+      return "A member since: Date unavailable";
+    }
+
+    const date =
+      typeof createdAt === "string" ? new Date(createdAt) : createdAt;
+
+    if (Number.isNaN(date.getTime())) {
+      return "A member since: Date unavailable";
+    }
+
+    return `A member since: ${date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "2-digit",
+    })}`;
+  };
+
+  const formatRole = (role: string | null | undefined): string => {
+    if (!role?.trim()) {
+      return "Unknown role";
+    }
+
+    return role
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean)
+      .map((value) => value.charAt(0).toUpperCase() + value.slice(1))
+      .join(", ");
+  };
+
+  const loadOrganizations = async () => {
+    const organizationsState = organizationsStore.get();
+    const sessionState = sessionStore.get();
+
+    if (organizationsState.isPending) {
+      isLoading = true;
       return;
     }
 
-    if (data && data.length === 0) {
-      goto("/onboarding");
-    } else if (data && data.length === 1) {
-      const OnlyOrg = data[0];
-      if (OnlyOrg) {
-        activeOrganization(OnlyOrg.id);
-      }
+    if (organizationsState.error) {
+      toast.error(
+        `Failed to load organizations: ${organizationsState.error.message}`
+      );
+      displayOrganizations = [];
+      isLoading = false;
+      return;
     }
-  });
 
-  const activeOrganization = async (organizationId: string) => {
+    const organizations = organizationsState.data ?? [];
+    const userId = sessionState.data?.user.id;
+    const activeOrganizationId =
+      sessionState.data?.session.activeOrganizationId ?? null;
+
+    if (!(organizations.length && userId)) {
+      displayOrganizations = [];
+      isLoading = false;
+      return;
+    }
+
+    isLoading = true;
+
+    const results = await Promise.all(
+      organizations.map(async (organization) => {
+        const { data, error } = await authClient.organization.listMembers({
+          query: {
+            organizationId: organization.id,
+            filterField: "userId",
+            filterOperator: "eq",
+            filterValue: userId,
+            limit: 1,
+          },
+        });
+
+        if (error) {
+          return {
+            id: organization.id,
+            name: organization.name,
+            slug: organization.slug,
+            role: "Unknown role",
+            memberSince: "A member since: Date unavailable",
+            isActive: organization.id === activeOrganizationId,
+          };
+        }
+
+        const member = data?.members?.[0];
+
+        return {
+          id: organization.id,
+          name: organization.name,
+          slug: organization.slug,
+          role: formatRole(member?.role),
+          memberSince: formatMemberSince(member?.createdAt),
+          isActive: organization.id === activeOrganizationId,
+        };
+      })
+    );
+
+    displayOrganizations = results;
+    isLoading = false;
+  };
+
+  const handleSwitchOrganization = async (organizationId: string) => {
     activatingOrganizationId = organizationId;
+
     try {
-      await authClient.organization.setActive({ organizationId });
+      const { error } = await authClient.organization.setActive({
+        organizationId,
+      });
+
+      if (error) {
+        toast.error(`Failed to switch organization: ${error.message}`);
+        return;
+      }
+
+      toast.success("Organization switched");
       await invalidateAll();
+      await loadOrganizations();
     } finally {
       activatingOrganizationId = null;
     }
   };
+
+  onMount(() => {
+    loadOrganizations();
+  });
+
+  organizationsStore.subscribe(() => {
+    loadOrganizations();
+  });
+
+  sessionStore.subscribe(() => {
+    loadOrganizations();
+  });
 </script>
 
-{#if $organizations.isPending}
-  <div class="w-full max-w-sm md:max-w-3xl">
-    <div class="bg-card text-card-foreground rounded-xl border p-6 shadow-sm">
-      <div class="flex items-start gap-3">
-        <span
-          class="border-primary/30 border-t-primary mt-0.5 size-5 animate-spin rounded-full border-2"
-          aria-hidden="true"
-        ></span>
-        <div class="space-y-1">
-          <p class="font-semibold">Loading organizations</p>
-          <p class="text-muted-foreground text-sm">
-            Fetching your available organizations...
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-{:else if !$organizations.data?.length}
-  <div class="w-full max-w-sm md:max-w-3xl">
-    <div
-      class="bg-card text-card-foreground rounded-xl border p-6 text-center shadow-sm"
-    >
-      <p class="font-semibold">No organizations found</p>
-      <p class="text-muted-foreground mt-1 text-sm">
-        You do not have access to any organizations yet.
+<ProfileSettingsSection
+  title="Organizations"
+  description="Organizations you belong to. Switch your active workspace from here."
+>
+  {#snippet children()}
+    <div class="space-y-4">
+      <p class="text-muted-foreground text-sm">
+        {#if isLoading}
+          Loading organizations...
+        {:else}
+          {displayOrganizations.length}
+          organization{displayOrganizations.length === 1 ? "" : "s"}
+        {/if}
       </p>
-    </div>
-  </div>
-{:else}
-  <div class="w-full max-w-sm space-y-3 md:max-w-3xl">
-    <h1 class="text-2xl font-semibold tracking-tight"
-      >Select an organization</h1
-    >
-    <p class="text-muted-foreground text-sm">
-      Click an organization to continue.
-    </p>
 
-    <ul class="space-y-3">
-      {#each $organizations.data as organization (organization.id)}
-        <li
-          class="group bg-card text-card-foreground ring-offset-background w-full rounded-xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-80"
-        >
-          <div class="flex items-center justify-between gap-3">
-            <div class="min-w-0">
-              <p class="truncate font-medium">{organization.name}</p>
-              <p class="text-muted-foreground text-sm">
-                {activatingOrganizationId === organization.id
-                      ? "Switching organization..."
-                      : "Click to use this organization"}
-              </p>
-            </div>
-            {#if activatingOrganizationId !== organization.id}
-              <button
-                type="button"
-                class="cursor-pointer"
-                disabled={activatingOrganizationId === organization.id}
-                onclick={() => activeOrganization(organization.id)}
-              >
-                <span
-                  class="text-muted-foreground group-hover:text-foreground shrink-0 text-sm transition-colors"
-                >
-                  {activatingOrganizationId === organization.id ? "..." : "Open"}
-                </span>
-              </button>
-            {/if}
+      <Card.Root class="py-0">
+        {#if isLoading}
+          <ul class="divide-y">
+            {#each Array.from({ length: 2 }) as _, index (index)}
+              <li class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+                <div class="flex min-w-0 flex-1 items-start gap-3">
+                  <Skeleton class="size-10 shrink-0 rounded-lg" />
+                  <div class="min-w-0 flex-1 space-y-2">
+                    <Skeleton class="h-4 w-40" />
+                    <Skeleton class="h-3 w-32" />
+                    <Skeleton class="h-3 w-52" />
+                  </div>
+                </div>
+                <Skeleton class="h-8 w-44 shrink-0" />
+              </li>
+            {/each}
+          </ul>
+        {:else if displayOrganizations.length === 0}
+          <div class="text-muted-foreground p-4 text-sm">
+            You do not have access to any organizations yet.
           </div>
-        </li>
-      {/each}
-    </ul>
-  </div>
-{/if}
+        {:else}
+          <ul class="divide-y">
+            {#each displayOrganizations as organization (organization.id)}
+              <li class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+                <div class="flex min-w-0 flex-1 items-start gap-3">
+                  <div
+                    class="bg-muted text-muted-foreground flex size-10 shrink-0 items-center justify-center rounded-lg"
+                  >
+                    <BuildingIcon class="size-5" />
+                  </div>
+                  <div class="min-w-0 space-y-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <p class="font-medium">{organization.name}</p>
+                      {#if organization.isActive}
+                        <span
+                          class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-medium"
+                        >
+                          Current organization
+                        </span>
+                      {/if}
+                    </div>
+                    <p class="text-muted-foreground text-sm">
+                      {organization.role}
+                    </p>
+                    <p class="text-muted-foreground text-xs">
+                      {organization.memberSince}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  type="button"
+                  disabled={organization.isActive ||
+                    activatingOrganizationId === organization.id}
+                  class="shrink-0"
+                  aria-label={`Switch to ${organization.name}`}
+                  onclick={() => handleSwitchOrganization(organization.id)}
+                >
+                  {#if organization.isActive}
+                    Active
+                  {:else if activatingOrganizationId === organization.id}
+                    Switching...
+                  {:else}
+                    Switch to this Organization
+                  {/if}
+                </Button>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </Card.Root>
+    </div>
+  {/snippet}
+</ProfileSettingsSection>
