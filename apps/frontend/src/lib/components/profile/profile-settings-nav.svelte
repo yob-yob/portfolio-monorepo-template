@@ -1,4 +1,5 @@
 <script lang="ts">
+  import BuildingIcon from "@lucide/svelte/icons/building";
   import FileTextIcon from "@lucide/svelte/icons/file-text";
   import Link2Icon from "@lucide/svelte/icons/link-2";
   import MailIcon from "@lucide/svelte/icons/mail";
@@ -36,6 +37,14 @@
       description: "Sign-in methods on your account",
       icon: Link2Icon,
       match: (pathname: string) => pathname.startsWith("/profile/accounts"),
+    },
+    {
+      href: "/profile/organizations",
+      label: "Organizations",
+      description: "Manage your organizations",
+      icon: BuildingIcon,
+      match: (pathname: string) =>
+        pathname.startsWith("/profile/organizations"),
     },
     {
       href: "/profile/account-retention",
