@@ -3,6 +3,7 @@
   import HomeIcon from "@lucide/svelte/icons/home";
   import type { Component } from "svelte";
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import * as Collapsible from "$lib/components/ui/collapsible/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
 
@@ -29,7 +30,7 @@
   <Sidebar.GroupLabel>{title}</Sidebar.GroupLabel>
   <Sidebar.Menu>
     <Sidebar.MenuItem>
-      <Sidebar.MenuButton onclick={() => goto("/")} isActive={true}>
+      <Sidebar.MenuButton onclick={() => goto(resolve("/"))} isActive={true}>
         <HomeIcon />
         Dashboard
       </Sidebar.MenuButton>

@@ -2,6 +2,7 @@
   import { authClient } from "@city-os/auth/client";
   import type { HTMLAttributes } from "svelte/elements";
   import { goto, invalidateAll } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import loginBanner from "$lib/assets/login-banner.svg";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
@@ -39,7 +40,7 @@
       errorMessage = error.message ?? "An unknown error occurred";
     } else {
       invalidateAll();
-      goto(data.redirect && data.url ? data.url : "/");
+      goto(data.redirect && data.url ? data.url : resolve("/"));
     }
     isLoading = false;
   };

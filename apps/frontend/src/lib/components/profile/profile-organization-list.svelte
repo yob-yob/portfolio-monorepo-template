@@ -102,7 +102,7 @@
           },
         });
 
-        const fakeMemberDetails = {
+        const unknownMemberDetail = {
           id: organization.id,
           name: organization.name,
           slug: organization.slug,
@@ -112,13 +112,13 @@
         };
 
         if (error) {
-          return fakeMemberDetails;
+          return unknownMemberDetail;
         }
 
         const member = data.members[0];
 
         if (!member) {
-          return fakeMemberDetails;
+          return unknownMemberDetail;
         }
 
         return {
@@ -188,7 +188,7 @@
       <Card.Root class="py-0">
         {#if isLoading}
           <ul class="divide-y">
-            {#each Array.from({ length: 2 }) as _, index (index)}
+            {#each Array.from({ length: 3 }) as _, index (index)}
               <li class="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
                 <div class="flex min-w-0 flex-1 items-start gap-3">
                   <Skeleton class="size-10 shrink-0 rounded-lg" />

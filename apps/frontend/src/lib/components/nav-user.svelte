@@ -6,6 +6,7 @@
   import CreditCardIcon from "@lucide/svelte/icons/credit-card";
   import LogOutIcon from "@lucide/svelte/icons/log-out";
   import { goto, invalidateAll } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
@@ -68,11 +69,13 @@
 
         <DropdownMenu.Separator />
         <DropdownMenu.Group>
-          <DropdownMenu.Item onSelect={() => goto("/profile")}>
+          <DropdownMenu.Item onSelect={() => goto(resolve("/profile"))}>
             <BadgeCheckIcon />
             Account
           </DropdownMenu.Item>
-          <DropdownMenu.Item onSelect={() => goto('/select-organization')}>
+          <DropdownMenu.Item
+            onSelect={() => goto(resolve("/select-organization"))}
+          >
             <CreditCardIcon />
             Change organization
           </DropdownMenu.Item>

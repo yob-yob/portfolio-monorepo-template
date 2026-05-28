@@ -1,4 +1,4 @@
-<!-- DASHBOARD -->
+<!-- Organization DASHBOARD -->
 <script lang="ts">
   import { onMount } from "svelte";
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";

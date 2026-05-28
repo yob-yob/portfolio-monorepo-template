@@ -3,6 +3,7 @@
   import type { ZxcvbnResult } from "@zxcvbn-ts/core";
   import type { HTMLAttributes } from "svelte/elements";
   import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { backend } from "$lib/api";
   import { Button } from "$lib/components/ui/button/index.js";
   import {
@@ -67,7 +68,7 @@
     if (error) {
       errorMessage = error.value.message ?? "Installation failed.";
     } else {
-      goto("/");
+      goto(resolve("/"));
     }
 
     isLoading = false;
