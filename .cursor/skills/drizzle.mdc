@@ -731,7 +731,7 @@ const ApiResponseSchema = v.variant("status", [
 
 ```typescript
 const EnvSchema = v.object({
-  NODE_ENV: v.picklist(["development", "production", "test"]),
+  APP_ENV: v.picklist(["development", "production", "test"]),
   PORT: v.pipe(v.string(), v.transform(Number), v.integer(), v.minValue(1)),
   DATABASE_URL: v.pipe(v.string(), v.url()),
   API_KEY: v.pipe(v.string(), v.minLength(32)),

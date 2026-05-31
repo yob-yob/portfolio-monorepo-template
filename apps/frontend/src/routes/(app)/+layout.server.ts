@@ -21,12 +21,12 @@ export const load = async ({ locals, request }) => {
   });
 
   if (error) {
-    //
+    throw new Error("Failed to fetch organization data");
   }
 
   return {
     user: locals.user,
     session: locals.session,
-    activeOrganizationSlug: data?.slug,
+    activeOrganizationSlug: data.slug,
   };
 };

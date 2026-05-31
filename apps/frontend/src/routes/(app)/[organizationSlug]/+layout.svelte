@@ -5,8 +5,9 @@
   import { Separator } from "$lib/components/ui/separator/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
+  import { setActiveOrganizationSlug } from "$lib/contexts/active-organization.svelte.js";
 
-  const { children, data } = $props();
+  const { children, data, params } = $props();
 
   onMount(() => {
     const homeCrumb = breadcrumbs.addCrumb({
@@ -18,11 +19,16 @@
       breadcrumbs.removeCrumb(homeCrumb);
     };
   });
+
+  setActiveOrganizationSlug(() => params.organizationSlug);
 </script>
 
 <!-- AUTH PAGES Layout -->
 <Sidebar.Provider>
-  <AppSidebar user={data.user} />
+  <AppSidebar
+    user={data.user}
+    activeOrganizationSlug={params.organizationSlug}
+  />
   <Sidebar.Inset>
     <header
       class="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12"

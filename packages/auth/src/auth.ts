@@ -18,6 +18,19 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not set");
 }
 
+if (!process.env.DOMAIN) {
+  if (process.env.APP_ENV === "development") {
+    console.warn("Development mode detected: Only Allowing localhost:*");
+  } else {
+    throw new Error("DOMAIN is not set");
+  }
+} else if (
+  process.env.DOMAIN.startsWith("http://") ||
+  process.env.DOMAIN.startsWith("https://")
+) {
+  throw new Error("DOMAIN should not have HTTP:// or HTTPS:// prefixes");
+}
+
 const redis = new Redis({
   host: "localhost",
   port: 6379,
@@ -36,8 +49,14 @@ export default betterAuth({
     keyPrefix: "city-os:auth:",
   }),
   baseURL: {
-    allowedHosts: ["http://localhost:*"],
+    allowedHosts: [
+      ...(process.env.APP_ENV === "development" ? ["localhost:*"] : []),
+      ...(process.env.DOMAIN
+        ? [`${process.env.DOMAIN}`, `*.${process.env.DOMAIN}`]
+        : []),
+    ],
     fallback: "http://localhost:3000",
+    protocol: process.env.APP_ENV === "development" ? "http" : "https",
   },
   basePath: "/",
   plugins: [openAPI(), organizationPlugin, emailOtpPlugin],
@@ -50,6 +69,10 @@ export default betterAuth({
   },
   session: {
     preserveSessionInDatabase: true,
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // Cache duration in seconds
+    },
   },
   user: {
     changeEmail: {

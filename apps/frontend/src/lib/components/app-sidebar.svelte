@@ -1,52 +1,60 @@
 <script lang="ts" module>
   import BookOpenIcon from "@lucide/svelte/icons/book-open";
-  import BotIcon from "@lucide/svelte/icons/bot";
   import ChartPieIcon from "@lucide/svelte/icons/chart-pie";
   import FrameIcon from "@lucide/svelte/icons/frame";
   import MapIcon from "@lucide/svelte/icons/map";
   import Settings2Icon from "@lucide/svelte/icons/settings-2";
-  import SquareTerminalIcon from "@lucide/svelte/icons/square-terminal";
+
+  const projects = [
+    {
+      name: "Design Engineering",
+      url: "#",
+      icon: FrameIcon,
+    },
+    {
+      name: "Sales & Marketing",
+      url: "#",
+      icon: ChartPieIcon,
+    },
+    {
+      name: "Travel",
+      url: "#",
+      icon: MapIcon,
+    },
+  ];
+</script>
+
+<script lang="ts">
+  import type { User } from "@city-os/auth/client";
+  import { type ComponentProps } from "svelte";
+  import { authClient } from "@/auth/client";
+  import { resolve } from "$app/paths";
+  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+  import NavMain from "./nav-main.svelte";
+  import NavProjects from "./nav-projects.svelte";
+  import NavUser from "./nav-user.svelte";
+  import TeamSwitcher from "./team-switcher.svelte";
+
+  let {
+    ref = $bindable(null),
+    collapsible = "icon",
+    user = $bindable<User>(),
+    activeOrganizationSlug = $bindable<string>(),
+    ...restProps
+  }: ComponentProps<typeof Sidebar.Root> & {
+    user: User;
+    activeOrganizationSlug: string;
+  } = $props();
+
+  const sessionStore = authClient.useSession();
+
+  let teams = $state(authClient.organization.listTeams());
+
+  sessionStore.subscribe(() => {
+    teams = authClient.organization.listTeams();
+  });
 
   const navMain = [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminalIcon,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: BotIcon,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
     {
       title: "Documentation",
       url: "#",
@@ -77,11 +85,15 @@
       items: [
         {
           title: "General",
-          url: "#",
+          url: resolve("/(app)/[organizationSlug]/settings/general", {
+            organizationSlug: activeOrganizationSlug,
+          }),
         },
         {
           title: "Team",
-          url: "#",
+          url: resolve("/(app)/[organizationSlug]/settings/teams", {
+            organizationSlug: activeOrganizationSlug,
+          }),
         },
         {
           title: "Billing",
@@ -94,52 +106,6 @@
       ],
     },
   ];
-
-  const projects = [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: FrameIcon,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: ChartPieIcon,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: MapIcon,
-    },
-  ];
-</script>
-
-<script lang="ts">
-  import type { User } from "@city-os/auth/client";
-  import { type ComponentProps, onMount } from "svelte";
-  import { authClient } from "@/auth/client";
-  import * as Sidebar from "$lib/components/ui/sidebar/index.js";
-  import NavMain from "./nav-main.svelte";
-  import NavProjects from "./nav-projects.svelte";
-  import NavUser from "./nav-user.svelte";
-  import TeamSwitcher from "./team-switcher.svelte";
-
-  let {
-    ref = $bindable(null),
-    collapsible = "icon",
-    user = $bindable<User>(),
-    ...restProps
-  }: ComponentProps<typeof Sidebar.Root> & {
-    user: User;
-  } = $props();
-
-  const sessionStore = authClient.useSession();
-
-  let teams = $state(authClient.organization.listTeams());
-
-  sessionStore.subscribe(() => {
-    teams = authClient.organization.listTeams();
-  });
 </script>
 
 <Sidebar.Root bind:ref {collapsible} {...restProps}>
