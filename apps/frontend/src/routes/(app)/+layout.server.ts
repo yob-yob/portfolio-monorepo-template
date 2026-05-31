@@ -14,6 +14,7 @@ export const load = async ({ locals, request }) => {
   const { data, error } = await authClient.organization.getFullOrganization({
     query: {
       organizationId: locals.session.activeOrganizationId,
+      membersLimit: 0, // we don't need this...
     },
     fetchOptions: {
       headers: request.headers,

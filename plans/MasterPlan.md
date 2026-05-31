@@ -875,7 +875,7 @@ const app = new Elysia()
 
 ## Development vs Production
 
-- In development (`NODE_ENV=development`): Swagger UI is accessible at `http://localhost:5173/swagger` after login
+- In development (`APP_ENV=development`): Swagger UI is accessible at `http://localhost:5173/swagger` after login
 - In production: Swagger UI remains auth-protected. Consider adding an additional environment flag (`ENABLE_SWAGGER=true/false`) to fully disable it in production if desired — document this decision in the plan
 
 ---
