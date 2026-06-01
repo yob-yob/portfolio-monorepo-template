@@ -1,6 +1,14 @@
 <!-- Organization DASHBOARD -->
+<script lang="ts" module>
+  export const OrganizationDashboardRoute = (organizationSlug: string) =>
+    resolve("/(app)/[organizationSlug]", {
+      organizationSlug,
+    });
+</script>
+
 <script lang="ts">
   import { onMount } from "svelte";
+  import { resolve } from "$app/paths";
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
 
   onMount(() => {

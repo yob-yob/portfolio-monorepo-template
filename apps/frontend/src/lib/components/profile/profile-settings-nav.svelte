@@ -5,54 +5,57 @@
   import MailIcon from "@lucide/svelte/icons/mail";
   import MonitorSmartphoneIcon from "@lucide/svelte/icons/monitor-smartphone";
   import UserRoundIcon from "@lucide/svelte/icons/user-round";
+  import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { Button } from "$lib/components/ui/button/index.js";
 
   const navItems = [
     {
-      href: "/profile",
+      href: resolve("/(app)/profile"),
       label: "General",
       description: "Profile and password",
       icon: UserRoundIcon,
-      match: (pathname: string) =>
-        pathname === "/profile" || pathname === "/profile/",
+      match: (pathname: string) => pathname === resolve("/(app)/profile"),
     },
     {
-      href: "/profile/email",
+      href: resolve("/(app)/profile/email"),
       label: "Email address",
       description: "Change your sign-in email",
       icon: MailIcon,
-      match: (pathname: string) => pathname.startsWith("/profile/email"),
+      match: (pathname: string) =>
+        pathname.startsWith(resolve("/(app)/profile/email")),
     },
     {
-      href: "/profile/sessions",
+      href: resolve("/(app)/profile/sessions"),
       label: "Sessions",
       description: "Active devices and sign-ins",
       icon: MonitorSmartphoneIcon,
-      match: (pathname: string) => pathname.startsWith("/profile/sessions"),
+      match: (pathname: string) =>
+        pathname.startsWith(resolve("/(app)/profile/sessions")),
     },
     {
-      href: "/profile/accounts",
+      href: resolve("/(app)/profile/accounts"),
       label: "Connected accounts",
       description: "Sign-in methods on your account",
       icon: Link2Icon,
-      match: (pathname: string) => pathname.startsWith("/profile/accounts"),
+      match: (pathname: string) =>
+        pathname.startsWith(resolve("/(app)/profile/accounts")),
     },
     {
-      href: "/profile/organizations",
+      href: resolve("/(app)/profile/organizations"),
       label: "Organizations",
       description: "Manage your organizations",
       icon: BuildingIcon,
       match: (pathname: string) =>
-        pathname.startsWith("/profile/organizations"),
+        pathname.startsWith(resolve("/(app)/profile/organizations")),
     },
     {
-      href: "/profile/account-retention",
+      href: resolve("/(app)/profile/account-retention"),
       label: "Account retention",
       description: "Audit and compliance policy",
       icon: FileTextIcon,
       match: (pathname: string) =>
-        pathname.startsWith("/profile/account-retention"),
+        pathname.startsWith(resolve("/(app)/profile/account-retention")),
     },
   ] as const;
 </script>

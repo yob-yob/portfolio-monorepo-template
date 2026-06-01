@@ -1,3 +1,9 @@
+<script lang="ts" module>
+  import { resolve } from "$app/paths";
+
+  export const ProfileEmailRoute = () => resolve("/(app)/profile/email");
+</script>
+
 <script lang="ts">
   import { onMount } from "svelte";
   import ProfileChangeEmail from "$lib/components/profile/profile-change-email.svelte";
@@ -6,20 +12,14 @@
   const { data } = $props();
 
   onMount(() => {
-    const profileCrumb = breadcrumbs.addCrumb({
-      href: "/profile",
-      label: "Profile",
-      sort_order: 2,
-    });
     const emailCrumb = breadcrumbs.addCrumb({
-      href: "/profile/email",
+      href: ProfileEmailRoute(),
       label: "Email address",
       sort_order: 3,
     });
 
     return () => {
       breadcrumbs.removeCrumb(emailCrumb);
-      breadcrumbs.removeCrumb(profileCrumb);
     };
   });
 </script>

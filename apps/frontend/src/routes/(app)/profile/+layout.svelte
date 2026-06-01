@@ -7,18 +7,27 @@
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
   import { setActiveOrganizationSlug } from "$lib/contexts/active-organization.svelte.js";
+  import { OrganizationDashboardRoute } from "../[organizationSlug]/+page.svelte";
+  import { ProfileSettingsRoute } from "./+page.svelte";
 
   const { children, data } = $props();
 
   onMount(() => {
     const homeCrumb = breadcrumbs.addCrumb({
-      href: "/",
+      href: OrganizationDashboardRoute(data.activeOrganizationSlug),
       label: "Home",
       sort_order: 1,
     });
 
+    const profileCrumb = breadcrumbs.addCrumb({
+      href: ProfileSettingsRoute(),
+      label: "Profile",
+      sort_order: 2,
+    });
+
     return () => {
       breadcrumbs.removeCrumb(homeCrumb);
+      breadcrumbs.removeCrumb(profileCrumb);
     };
   });
 
@@ -41,8 +50,8 @@
           orientation="vertical"
           class="me-2 data-[orientation=vertical]:h-4"
         />
+        <AppBreadcrumbs />
       </div>
-      <AppBreadcrumbs />
     </header>
     <div class="flex flex-1 flex-col gap-4 p-4 pt-0">
       <div

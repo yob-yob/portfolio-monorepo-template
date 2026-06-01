@@ -30,6 +30,10 @@
   import { authClient } from "@/auth/client";
   import { resolve } from "$app/paths";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+  import { OrganizationSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/+page.svelte";
+  import { OrganizationBillingSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/billing/+page.svelte";
+  import { OrganizationMembersSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/members/+page.svelte";
+  import { OrganizationTeamsSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/teams/+page.svelte";
   import NavMain from "./nav-main.svelte";
   import NavProjects from "./nav-projects.svelte";
   import NavUser from "./nav-user.svelte";
@@ -91,23 +95,19 @@
       items: [
         {
           title: "General",
-          url: resolve("/(app)/[organizationSlug]/settings/general", {
-            organizationSlug: activeOrganizationSlug,
-          }),
+          url: OrganizationSettingsRoute(activeOrganizationSlug),
         },
         {
           title: "Team",
-          url: resolve("/(app)/[organizationSlug]/settings/teams", {
-            organizationSlug: activeOrganizationSlug,
-          }),
+          url: OrganizationTeamsSettingsRoute(activeOrganizationSlug),
+        },
+        {
+          title: "Members",
+          url: OrganizationMembersSettingsRoute(activeOrganizationSlug),
         },
         {
           title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          url: OrganizationBillingSettingsRoute(activeOrganizationSlug),
         },
       ],
     },
