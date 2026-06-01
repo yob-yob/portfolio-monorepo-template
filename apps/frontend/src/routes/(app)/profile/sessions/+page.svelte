@@ -7,10 +7,12 @@
     const profileCrumb = breadcrumbs.addCrumb({
       href: "/profile",
       label: "Profile",
+      sort_order: 2,
     });
     const sessionsCrumb = breadcrumbs.addCrumb({
       href: "/profile/sessions",
       label: "Sessions",
+      sort_order: 3,
     });
 
     return () => {

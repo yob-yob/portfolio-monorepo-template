@@ -4,13 +4,14 @@
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
 
   onMount(() => {
-    const dashboardCrumb = breadcrumbs.addCrumb({
+    const OrganizationDashboardCrumb = breadcrumbs.addCrumb({
       href: "/",
       label: "Dashboard",
+      sort_order: 2,
     });
 
     return () => {
-      breadcrumbs.removeCrumb(dashboardCrumb);
+      breadcrumbs.removeCrumb(OrganizationDashboardCrumb);
     };
   });
 </script>

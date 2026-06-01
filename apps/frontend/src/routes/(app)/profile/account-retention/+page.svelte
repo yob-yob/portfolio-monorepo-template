@@ -7,10 +7,13 @@
     const profileCrumb = breadcrumbs.addCrumb({
       href: "/profile",
       label: "Profile",
+      sort_order: 2,
     });
+
     const retentionCrumb = breadcrumbs.addCrumb({
       href: "/profile/account-retention",
       label: "Account retention",
+      sort_order: 3,
     });
 
     return () => {

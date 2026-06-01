@@ -7,10 +7,12 @@
     const profileCrumb = breadcrumbs.addCrumb({
       href: "/profile",
       label: "Profile",
+      sort_order: 2,
     });
     const accountsCrumb = breadcrumbs.addCrumb({
       href: "/profile/accounts",
       label: "Connected accounts",
+      sort_order: 3,
     });
 
     return () => {

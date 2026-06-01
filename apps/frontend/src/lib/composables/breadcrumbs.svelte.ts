@@ -1,8 +1,9 @@
 import { SvelteSet } from "svelte/reactivity";
 
-interface Crumb {
+export interface Crumb {
   href: string;
   label: string;
+  sort_order: number;
 }
 
 class Breadcrumbs {
@@ -14,12 +15,19 @@ class Breadcrumbs {
     return crumb;
   }
 
-  removeCrumb(crumb: Crumb) {
+  removeCrumb(crumb: Crumb | null) {
+    if (!crumb) {
+      return;
+    }
     this.breadcrumbs.delete(crumb);
   }
 
   clearBreadcrumbs() {
     this.breadcrumbs.clear();
+  }
+
+  sortedBreadcrumbs() {
+    return [...this.breadcrumbs].sort((a, b) => a.sort_order - b.sort_order);
   }
 }
 

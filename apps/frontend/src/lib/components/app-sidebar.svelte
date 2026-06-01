@@ -54,6 +54,12 @@
     teams = authClient.organization.listTeams();
   });
 
+  const dashboardUrl = $derived(
+    resolve("/(app)/[organizationSlug]", {
+      organizationSlug: activeOrganizationSlug,
+    })
+  );
+
   const navMain = [
     {
       title: "Documentation",
@@ -123,7 +129,7 @@
     {/await}
   </Sidebar.Header>
   <Sidebar.Content>
-    <NavMain items={navMain} />
+    <NavMain items={navMain} {dashboardUrl} />
     <NavProjects {projects} />
   </Sidebar.Content>
   <Sidebar.Footer>

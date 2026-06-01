@@ -1,7 +1,6 @@
 import { redirect } from "@sveltejs/kit";
-import { authClient } from "@/auth/client";
 
-export const load = async ({ locals, request }) => {
+export const load = ({ locals }) => {
   if (!(locals.user && locals.session)) {
     redirect(307, "/auth/login");
   }
@@ -11,23 +10,8 @@ export const load = async ({ locals, request }) => {
     redirect(307, "/select-organization");
   }
 
-  const { data, error } = await authClient.organization.getFullOrganization({
-    query: {
-      organizationId: locals.session.activeOrganizationId,
-      membersLimit: 0, // we don't need this...
-    },
-    fetchOptions: {
-      headers: request.headers,
-    },
-  });
-
-  if (error) {
-    throw new Error("Failed to fetch organization data");
-  }
-
   return {
     user: locals.user,
     session: locals.session,
-    activeOrganizationSlug: data.slug,
   };
 };

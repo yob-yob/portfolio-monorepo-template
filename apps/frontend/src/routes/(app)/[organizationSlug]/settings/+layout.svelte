@@ -1,24 +1,23 @@
-<!-- Organization general settings page  -->
-<script lang="ts">
+<script>
   import { onMount } from "svelte";
   import { resolve } from "$app/paths";
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
 
-  const { params } = $props();
+  const { children, params } = $props();
 
   onMount(() => {
-    const OrganizationGeneralSettingsCrumb = breadcrumbs.addCrumb({
+    const OrganizationSettingsCrumb = breadcrumbs.addCrumb({
       href: resolve("/(app)/[organizationSlug]/settings/general", {
         organizationSlug: params.organizationSlug,
       }),
-      label: "General",
-      sort_order: 3,
+      label: "Organization Settings",
+      sort_order: 2,
     });
 
     return () => {
-      breadcrumbs.removeCrumb(OrganizationGeneralSettingsCrumb);
+      breadcrumbs.removeCrumb(OrganizationSettingsCrumb);
     };
   });
 </script>
 
-<h1>Organization General Settings</h1>
+{@render children()}

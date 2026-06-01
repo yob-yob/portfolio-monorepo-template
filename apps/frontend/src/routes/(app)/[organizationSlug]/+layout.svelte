@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import AppBreadcrumbs from "$lib/components/app-breadcrumbs.svelte";
   import AppSidebar from "$lib/components/app-sidebar.svelte";
-  import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
   import { Separator } from "$lib/components/ui/separator/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
@@ -10,13 +10,14 @@
   const { children, data, params } = $props();
 
   onMount(() => {
-    const homeCrumb = breadcrumbs.addCrumb({
+    const OrganizationHomeDashboardCrumb = breadcrumbs.addCrumb({
       href: "/",
       label: "Home",
+      sort_order: 1,
     });
 
     return () => {
-      breadcrumbs.removeCrumb(homeCrumb);
+      breadcrumbs.removeCrumb(OrganizationHomeDashboardCrumb);
     };
   });
 
@@ -39,21 +40,7 @@
           orientation="vertical"
           class="me-2 data-[orientation=vertical]:h-4"
         />
-        <Breadcrumb.Root>
-          <Breadcrumb.List>
-            {#each breadcrumbs.breadcrumbs as crumb, index}
-              <Breadcrumb.Item>
-                <Breadcrumb.Link href={crumb.href}>
-                  {crumb.label}
-                </Breadcrumb.Link>
-              </Breadcrumb.Item>
-
-              {#if index < breadcrumbs.breadcrumbs.size - 1}
-                <Breadcrumb.Separator class="hidden md:block" />
-              {/if}
-            {/each}
-          </Breadcrumb.List>
-        </Breadcrumb.Root>
+        <AppBreadcrumbs />
       </div>
     </header>
     <div class="flex flex-1 flex-col gap-4 p-4 pt-0">

@@ -19,6 +19,10 @@ const config = {
       "@/api-client/*": "../../packages/api-client/src/*",
       "@/auth/client": "../../packages/auth/src/auth-client.ts",
     },
+
+    experimental: {
+      handleRenderingErrors: true,
+    },
   },
 };
 
