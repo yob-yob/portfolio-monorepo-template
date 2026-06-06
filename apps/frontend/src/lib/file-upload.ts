@@ -29,12 +29,14 @@ export const uploadFiles = async (
       contextType,
       contextId,
       location,
-      files: files.map((file) => ({
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        versioned: file.versioned ?? false,
-      })),
+      files: files
+        .filter((file) => file.size > 0)
+        .map((file) => ({
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          versioned: file.versioned ?? false,
+        })),
     });
 
   if (uploadLogoError) {
