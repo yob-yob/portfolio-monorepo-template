@@ -1,6 +1,9 @@
 <script lang="ts">
   import CameraIcon from "@lucide/svelte/icons/camera";
   import { toast } from "svelte-sonner";
+  import { authClient } from "@/auth/client";
+  import { invalidateAll } from "$app/navigation";
+  import { backend } from "$lib/api";
   import SettingsSection from "$lib/components/settings-section.svelte";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -12,7 +15,13 @@
 
   const id = $props.id();
 
-  let { organizationName }: { organizationName: string } = $props();
+  let {
+    organizationName,
+    organizationId,
+  }: {
+    organizationName: string;
+    organizationId: string;
+  } = $props();
 
   let logoPreview = $state<string | undefined>(undefined);
 
@@ -25,12 +34,46 @@
       .toUpperCase() || "OR"
   );
 
-  const handleLogoChange = (event: Event) => {
+  const handleLogoChange = async (event: Event) => {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) {
       return;
     }
+
+    // upload logo
+    const { data: uploadLogoData, error: uploadLogoError } =
+      await backend.storage.upload.post({
+        contextType: "organization",
+        contextId: organizationId,
+        location: "logo",
+        files: [file],
+      });
+
+    if (uploadLogoError) {
+      toast.error(`Failed to upload logo: ${uploadLogoError.value.message}`);
+      return;
+    }
+
+    const { error: updateOrganizationLogoError } =
+      await authClient.organization.update({
+        data: {
+          logo: uploadLogoData.files[0],
+        },
+      });
+
+    if (updateOrganizationLogoError) {
+      toast.error(
+        `Failed to update organization logo: ${updateOrganizationLogoError.message}`
+      );
+
+      // delete uploaded file!!!
+
+      return;
+    }
+
+    invalidateAll();
+
     logoPreview = URL.createObjectURL(file);
   };
 

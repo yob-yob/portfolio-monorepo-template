@@ -5,14 +5,20 @@
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import { useSidebar } from "$lib/components/ui/sidebar/index.js";
 
-  // This should be `Component` after @lucide/svelte updates types
-  // biome-ignore lint/suspicious/noExplicitAny: reason
-  let { teams }: { teams: { name: string; logo: any; plan: string }[] } =
-    $props();
+  interface Teams {
+    logo: string;
+    name: string;
+    plan: string;
+  }
+
+  let {
+    teams = $bindable<Teams[]>(),
+  }: {
+    teams: Teams[];
+  } = $props();
   const sidebar = useSidebar();
 
-  // svelte-ignore state_referenced_locally
-  let activeTeam = $state(teams[0]);
+  let activeTeam = $derived.by(() => teams[0]);
 </script>
 
 <Sidebar.Menu>
@@ -29,7 +35,11 @@
               <div
                 class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg"
               >
-                <activeTeam.logo class="size-4" />
+                <img
+                  src={activeTeam.logo}
+                  alt={activeTeam.name}
+                  class="size-3.5 shrink-0"
+                >
               </div>
               <div class="grid flex-1 text-start text-sm leading-tight">
                 <span class="truncate font-medium"> {activeTeam.name} </span>
@@ -57,7 +67,7 @@
             <div
               class="flex size-6 items-center justify-center rounded-md border"
             >
-              <team.logo class="size-3.5 shrink-0" />
+              <img src={team.logo} alt={team.name} class="size-3.5 shrink-0">
             </div>
             {team.name}
             <DropdownMenu.Shortcut>⌘{index + 1}</DropdownMenu.Shortcut>

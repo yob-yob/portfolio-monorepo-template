@@ -27,7 +27,6 @@
 <script lang="ts">
   import type { User } from "@city-os/auth/client";
   import { type ComponentProps } from "svelte";
-  import { authClient } from "@/auth/client";
   import { resolve } from "$app/paths";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import { OrganizationSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/+page.svelte";
@@ -39,24 +38,24 @@
   import NavUser from "./nav-user.svelte";
   import TeamSwitcher from "./team-switcher.svelte";
 
+  interface Teams {
+    logo: string;
+    name: string;
+    plan: string;
+  }
+
   let {
     ref = $bindable(null),
     collapsible = "icon",
     user = $bindable<User>(),
     activeOrganizationSlug = $bindable<string>(),
+    teams = $bindable<Teams[]>(),
     ...restProps
   }: ComponentProps<typeof Sidebar.Root> & {
     user: User;
     activeOrganizationSlug: string;
+    teams: Teams[];
   } = $props();
-
-  const sessionStore = authClient.useSession();
-
-  let teams = $state(authClient.organization.listTeams());
-
-  sessionStore.subscribe(() => {
-    teams = authClient.organization.listTeams();
-  });
 
   const dashboardUrl = $derived(
     resolve("/(app)/[organizationSlug]", {
@@ -116,17 +115,7 @@
 
 <Sidebar.Root bind:ref {collapsible} {...restProps}>
   <Sidebar.Header>
-    {#await teams then {data}}
-      {#if data}
-        <TeamSwitcher
-          teams={data.map((team) => ({
-            name: team.name,
-            logo: "",
-            plan: "",
-          }))}
-        />
-      {/if}
-    {/await}
+    <TeamSwitcher {teams} />
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={navMain} {dashboardUrl} />

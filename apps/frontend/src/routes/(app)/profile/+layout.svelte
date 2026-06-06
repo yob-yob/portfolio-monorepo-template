@@ -39,6 +39,11 @@
   <AppSidebar
     user={data.user}
     activeOrganizationSlug={data.activeOrganizationSlug}
+    teams={data.userTeams.map((team) => ({
+      logo: "",
+      name: team.name,
+      plan: "FREE",
+    }))}
   />
   <Sidebar.Inset>
     <header

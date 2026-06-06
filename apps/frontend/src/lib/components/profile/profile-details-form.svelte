@@ -4,6 +4,7 @@
   import { authClient } from "@/auth/client";
   import { invalidateAll } from "$app/navigation";
   import { backend } from "$lib/api";
+  import SettingsSection from "$lib/components/settings-section.svelte";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import {
@@ -13,11 +14,11 @@
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
-  import SettingsSection from "$lib/components/settings-section.svelte";
 
   const id = $props.id();
 
-  let { user }: { user: { name: string; image?: string | null } } = $props();
+  let { user }: { user: { id: string; name: string; image?: string | null } } =
+    $props();
 
   let name = $derived(user.name);
   let avatarPreview = $derived(user.image);
@@ -38,7 +39,9 @@
 
     // Only Upload anything if the use has uploaded something...
     if (avatar.size > 0) {
-      const upload = await backend.api.v1.upload.post({
+      const upload = await backend.storage.upload.post({
+        contextType: "user",
+        contextId: user.id,
         files: [avatar],
         location: "avatar",
       });

@@ -11,7 +11,7 @@ export const load = async ({ locals, request }) => {
     redirect(307, "/select-organization");
   }
 
-  const { data, error: getOrganizationError } =
+  const { data: getOrganizationData, error: getOrganizationError } =
     await authClient.organization.getFullOrganization({
       query: {
         organizationId: locals.session.activeOrganizationId,
@@ -30,7 +30,24 @@ export const load = async ({ locals, request }) => {
     });
   }
 
+  const { data: userTeamsData, error: userTeamsError } =
+    await authClient.organization.listUserTeams({
+      fetchOptions: {
+        headers: request.headers,
+      },
+    });
+
+  if (userTeamsError) {
+    error(userTeamsError.status, {
+      code: userTeamsError.code ?? "NOT_FOUND",
+      message: userTeamsError.message ?? "User Teams Not Found",
+    });
+  }
+
   return {
-    activeOrganizationSlug: data.slug,
+    activeOrganizationSlug: getOrganizationData.slug,
+    userTeams: userTeamsData.filter(
+      (team) => team.organizationId === getOrganizationData.id
+    ),
   };
 };

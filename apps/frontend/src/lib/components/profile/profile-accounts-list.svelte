@@ -4,9 +4,9 @@
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
+  import SettingsSection from "$lib/components/settings-section.svelte";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-  import SettingsSection from "$lib/components/settings-section.svelte";
 
   interface LinkedAccount {
     accountId: string;

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-
   import AppBreadcrumbs from "$lib/components/app-breadcrumbs.svelte";
   import AppSidebar from "$lib/components/app-sidebar.svelte";
   import { Separator } from "$lib/components/ui/separator/index.js";
@@ -30,6 +29,11 @@
   <AppSidebar
     user={data.user}
     activeOrganizationSlug={params.organizationSlug}
+    teams={data.userTeams.map((team) => ({
+        logo: "",
+        name: team.name,
+        plan: "FREE",
+      }))}
   />
   <Sidebar.Inset>
     <header

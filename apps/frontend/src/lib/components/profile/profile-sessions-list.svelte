@@ -4,11 +4,11 @@
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import { authClient, type Session } from "@/auth/client";
+  import SettingsSection from "$lib/components/settings-section.svelte";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Separator } from "$lib/components/ui/separator/index.js";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-  import SettingsSection from "$lib/components/settings-section.svelte";
 
   interface DisplaySession {
     browser: string;

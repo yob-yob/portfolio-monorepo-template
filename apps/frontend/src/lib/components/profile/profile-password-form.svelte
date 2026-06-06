@@ -1,6 +1,7 @@
 <script lang="ts">
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
+  import SettingsSection from "$lib/components/settings-section.svelte";
   import { Button } from "$lib/components/ui/button/index.js";
   import {
     Field,
@@ -9,7 +10,6 @@
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
   import * as Password from "$lib/components/ui/password";
-  import SettingsSection from "$lib/components/settings-section.svelte";
 
   const id = $props.id();
 

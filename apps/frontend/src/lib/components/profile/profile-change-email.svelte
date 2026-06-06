@@ -1,6 +1,7 @@
 <script lang="ts">
   import BadgeCheckIcon from "@lucide/svelte/icons/badge-check";
   import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
+  import SettingsSection from "$lib/components/settings-section.svelte";
   import {
     Field,
     FieldDescription,
@@ -8,7 +9,6 @@
   } from "$lib/components/ui/field/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import ProfileEmailForm from "./profile-email-form.svelte";
-  import SettingsSection from "$lib/components/settings-section.svelte";
 
   const id = $props.id();
 

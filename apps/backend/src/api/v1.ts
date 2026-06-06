@@ -2,7 +2,6 @@ import Elysia from "elysia";
 import { onboarding } from "@/backend/modules/onboarding/index.ts";
 import { health } from "../modules/health/index.ts";
 import { setup } from "../modules/setup/index.ts";
-import { upload } from "../modules/upload/index.ts";
 
 export const apiV1 = new Elysia({
   prefix: "/api/v1",
@@ -10,5 +9,4 @@ export const apiV1 = new Elysia({
 })
   .use(onboarding)
   .use(setup)
-  .use(upload)
   .use(health);
