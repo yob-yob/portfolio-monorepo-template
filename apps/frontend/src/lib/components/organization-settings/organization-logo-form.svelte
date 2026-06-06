@@ -2,9 +2,11 @@
   import CameraIcon from "@lucide/svelte/icons/camera";
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
-  import { isSupportedMimeType } from "@/backend/utils/constants/supported-mime-types";
+  import {
+    getMimeTypeExtension,
+    isSupportedMimeType,
+  } from "@/backend/utils/constants/supported-mime-types";
   import { invalidateAll } from "$app/navigation";
-  import { backend } from "$lib/api";
   import SettingsSection from "$lib/components/settings-section.svelte";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -13,6 +15,7 @@
     FieldDescription,
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
+  import { uploadFiles } from "$lib/file-upload";
 
   const id = $props.id();
 
@@ -65,40 +68,39 @@
       return;
     }
 
-    // upload logo
-    const { data: uploadLogoData, error: uploadLogoError } =
-      await backend.storage.upload.post({
-        contextType: "organization",
-        contextId: organizationId,
-        location: "logo",
-        files: [file],
-      });
-
-    if (uploadLogoError) {
-      toast.error(`Failed to upload logo: ${uploadLogoError.value.message}`);
-      return;
-    }
-
-    const { error: updateOrganizationLogoError } =
-      await authClient.organization.update({
-        data: {
-          logo: uploadLogoData.files[0],
+    await uploadFiles(
+      "organization",
+      organizationId,
+      "logo",
+      [
+        {
+          name: `${organizationId}.${getMimeTypeExtension(file.type)}`,
+          type: file.type,
+          size: file.size,
+          File: file,
+          versioned: true,
         },
-      });
+      ],
+      (message: string) => toast.error(`Failed to upload logo: ${message}`),
+      (message: string) =>
+        toast.error(`Failed to update organization logo: ${message}`),
+      async (path: string) => {
+        const { error } = await authClient.organization.update({
+          data: { logo: path },
+        });
 
-    if (updateOrganizationLogoError) {
-      toast.error(
-        `Failed to update organization logo: ${updateOrganizationLogoError.message}`
-      );
+        if (error) {
+          toast.error(`Failed to update organization logo: ${error.message}`);
+          return false;
+        }
 
-      // delete uploaded file if an error occurs!!!
+        invalidateAll();
 
-      return;
-    }
+        toast.success("Organization logo update saved...");
 
-    invalidateAll();
-
-    toast.success("Organization logo update saved...");
+        return true;
+      }
+    );
   };
 </script>
 

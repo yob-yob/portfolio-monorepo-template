@@ -2,8 +2,11 @@
   import CameraIcon from "@lucide/svelte/icons/camera";
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
+  import {
+    getMimeTypeExtension,
+    isSupportedMimeType,
+  } from "@/backend/utils/constants/supported-mime-types";
   import { invalidateAll } from "$app/navigation";
-  import { backend } from "$lib/api";
   import SettingsSection from "$lib/components/settings-section.svelte";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
@@ -14,6 +17,7 @@
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
+  import { uploadFiles } from "$lib/file-upload";
 
   const id = $props.id();
 
@@ -30,44 +34,65 @@
     const name = formData.get("name") as string;
     const avatar = formData.get("avatar") as File;
 
-    let image: string | undefined;
+    let AvatarUpdated = false;
+    let NameUpdated = false;
 
-    if (avatar.size === 0 && name === user.name) {
-      toast.warning("Nothing to update");
-      return;
-    }
-
-    // Only Upload anything if the use has uploaded something...
-    if (avatar.size > 0) {
-      const upload = await backend.storage.upload.post({
-        contextType: "user",
-        contextId: user.id,
-        files: [avatar],
-        location: "avatar",
-      });
-
-      if (upload.error) {
-        toast.error(
-          `Failed to upload profile picture: ${upload.error.value.message}`
-        );
+    if (avatar.size !== 0) {
+      if (!isSupportedMimeType(avatar.type)) {
+        toast.warning(`Unsupported File Type: ${avatar.type}`);
         return;
       }
 
-      image = upload.data.files[0];
+      await uploadFiles(
+        "user",
+        user.id,
+        "avatar",
+        [
+          {
+            name: `${user.id}.${getMimeTypeExtension(avatar.type)}`,
+            type: avatar.type,
+            size: avatar.size,
+            File: avatar,
+            versioned: true,
+          },
+        ],
+        (message: string) => toast.error(`Failed to upload avatar: ${message}`),
+        (message: string) =>
+          toast.error(`Failed to update profile: ${message}`),
+        async (path: string) => {
+          const { error } = await authClient.updateUser({ image: path });
+
+          if (error) {
+            toast.error(`Failed to avatar profile: ${error.message}`);
+            return false;
+          }
+
+          AvatarUpdated = true;
+          toast.success("Profile Avatar updated successfully");
+          return true;
+        }
+      );
     }
 
-    const { error } = await authClient.updateUser({
-      name,
-      image,
-    });
+    if (user.name !== name) {
+      const { error } = await authClient.updateUser({
+        name,
+      });
 
-    if (error) {
-      toast.error(`Failed to update profile: ${error.message}`);
-      return;
+      if (error) {
+        toast.error(`Failed to update profile: ${error.message}`);
+        return;
+      }
+
+      toast.success("Profile name updated successfully");
+      NameUpdated = true;
     }
 
-    toast.success("Profile updated successfully");
-    invalidateAll();
+    if (AvatarUpdated || NameUpdated) {
+      invalidateAll();
+    } else {
+      toast.success("Nothing to update");
+    }
   };
 
   const handleAvatarChange = (event: Event) => {

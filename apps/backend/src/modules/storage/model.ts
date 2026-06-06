@@ -9,23 +9,60 @@
  */
 
 import { t, type UnwrapSchema } from "elysia";
+import type { StrictFileType } from "elysia/type-system/types";
 
-export const supportedStorageContextTypes = ["organization", "user"] as const;
+export const supportedStorageContextTypes = [
+  "organization",
+  "organization/team",
+  "user",
+] as const;
+
+// TODO: Put this in a CONFIG file, so that it's easier to find and modify
+export const supportedFileTypes: StrictFileType[] = [
+  "image/*",
+  "video/*",
+  "text/*",
+  "audio/*",
+  "application/json",
+  "application/pdf",
+  "application/xml",
+  "application/zip",
+] as const;
 
 export const StorageModel = {
   getStorageFileQuery: t.Object({
     path: t.String(),
+    v: t.Optional(t.String()),
   }),
-  uploadStorageFileBody: t.Object({
+  requestUploadFiles: t.Object({
     contextType: t.String({
       enum: supportedStorageContextTypes,
     }),
     contextId: t.String(),
     location: t.String(),
-    files: t.Files(),
+    files: t.Array(
+      t.Object({
+        name: t.String(),
+        type: t.String(),
+        size: t.Number(),
+        versioned: t.Boolean(),
+      })
+    ),
   }),
-  uploadStorageFileSuccessReponse: t.Object({
-    files: t.Array(t.String()),
+  requestUploadFileUrls: t.Object({
+    fileUploadUrls: t.Array(
+      t.Object({
+        fileName: t.String(),
+        url: t.String(),
+        path: t.String(),
+      })
+    ),
+    skippedFiles: t.Array(
+      t.Object({
+        fileName: t.String(),
+        reason: t.String(),
+      })
+    ),
   }),
 };
 

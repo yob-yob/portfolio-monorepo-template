@@ -17,43 +17,57 @@ export const StorageController = {
 
     return new Response(fileData);
   },
-  handleUploadRequest: async (body: StorageModel["uploadStorageFileBody"]) => {
+  handleUploadRequest: (body: StorageModel["requestUploadFiles"]) => {
     // Upload the file to the S3 bucket
-    const uploadedFiles = new Set<string>();
-    const skippedUploadedFiles = new Set<{ file: string; reason: string }>();
+    const uploadUrls = new Set<{
+      fileName: string;
+      url: string;
+      path: string;
+    }>();
+    const skippedUploadedFiles = new Set<{
+      fileName: string;
+      reason: string;
+    }>();
 
-    const filePath = `${body.contextType}/${body.contextId}/${body.location}`;
+    const fileDirectory = `${body.contextType}/${body.contextId}/${body.location}`;
 
     for (const file of body.files) {
       if (!isSupportedMimeType(file.type)) {
         skippedUploadedFiles.add({
-          file: file.name,
-          reason: `Unsupported file type: ${file.type}`,
+          fileName: file.name,
+          reason: `Unsupported file type: ${file.type} - File name: ${file.name}`,
         });
         continue;
       }
 
-      const fileName = `${randomUUIDv7()}.${getMimeTypeExtension(file.type)}`;
-      const filePathAndName = `${filePath}/${fileName}`;
+      const fileName = file.name
+        ? file.name
+        : `${randomUUIDv7()}.${getMimeTypeExtension(file.type)}`;
 
-      const uploadFileToS3 = await s3.write(filePathAndName, file);
+      const filePathAndName = `${fileDirectory}/${fileName}`;
 
-      if (uploadFileToS3 === 0) {
-        skippedUploadedFiles.add({
-          file: file.name,
-          reason: "There was a problem trying to upload the file to storage",
-        });
-        continue;
+      const fullUrl = new URL(process.env.APP_URL ?? "");
+
+      fullUrl.pathname = "/storage";
+
+      fullUrl.searchParams.append("path", filePathAndName);
+
+      if (file.versioned) {
+        fullUrl.searchParams.append("v", Date.now().toString());
       }
 
-      // generate asset url
-      const url = `${process.env.APP_URL}/storage?path=${filePathAndName}`;
-
-      uploadedFiles.add(url);
+      uploadUrls.add({
+        fileName: file.name,
+        url: s3.presign(filePathAndName, {
+          method: "PUT",
+          expiresIn: 1 * 60 * 60, // 1 hour
+        }),
+        path: fullUrl.toString(),
+      });
     }
 
     return status(201, {
-      files: Array.from(uploadedFiles),
+      fileUploadUrls: Array.from(uploadUrls),
       skippedFiles: Array.from(skippedUploadedFiles),
     });
   },

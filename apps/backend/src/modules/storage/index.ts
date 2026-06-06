@@ -14,9 +14,9 @@ export const storage = new Elysia()
     "/storage/upload",
     async ({ body }) => StorageController.handleUploadRequest(body),
     {
-      body: StorageModel.uploadStorageFileBody,
+      body: StorageModel.requestUploadFiles,
       response: {
-        201: StorageModel.uploadStorageFileSuccessReponse,
+        201: StorageModel.requestUploadFileUrls,
       },
     }
   );
