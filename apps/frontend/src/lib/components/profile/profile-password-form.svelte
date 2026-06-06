@@ -9,7 +9,7 @@
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
   import * as Password from "$lib/components/ui/password";
-  import ProfileSettingsSection from "./profile-settings-section.svelte";
+  import SettingsSection from "$lib/components/settings-section.svelte";
 
   const id = $props.id();
 
@@ -46,7 +46,7 @@
   };
 </script>
 
-<ProfileSettingsSection
+<SettingsSection
   title="Password"
   description="Change your password. You will stay signed in on this device."
 >
@@ -104,4 +104,4 @@
   {#snippet footer()}
     <Button type="submit" form="profile-password-form">Update password</Button>
   {/snippet}
-</ProfileSettingsSection>
+</SettingsSection>

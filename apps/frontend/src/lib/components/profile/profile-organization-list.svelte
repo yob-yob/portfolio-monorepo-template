@@ -4,10 +4,10 @@
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
   import { invalidateAll } from "$app/navigation";
+  import SettingsSection from "$lib/components/settings-section.svelte";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-  import ProfileSettingsSection from "./profile-settings-section.svelte";
 
   interface DisplayOrganization {
     id: string;
@@ -170,7 +170,7 @@
   });
 </script>
 
-<ProfileSettingsSection
+<SettingsSection
   title="Organizations"
   description="Organizations you belong to. Switch your active workspace from here."
 >
@@ -260,4 +260,4 @@
       </Card.Root>
     </div>
   {/snippet}
-</ProfileSettingsSection>
+</SettingsSection>

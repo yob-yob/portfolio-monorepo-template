@@ -6,7 +6,7 @@
   import { authClient } from "@/auth/client";
   import * as Card from "$lib/components/ui/card/index.js";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-  import ProfileSettingsSection from "./profile-settings-section.svelte";
+  import SettingsSection from "$lib/components/settings-section.svelte";
 
   interface LinkedAccount {
     accountId: string;
@@ -109,7 +109,7 @@
   });
 </script>
 
-<ProfileSettingsSection
+<SettingsSection
   title="Your sign-in methods"
   description="Accounts you use to sign in. Link additional providers when they are enabled."
 >
@@ -181,4 +181,4 @@
       </p>
     </div>
   {/snippet}
-</ProfileSettingsSection>
+</SettingsSection>

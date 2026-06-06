@@ -8,7 +8,7 @@
   } from "$lib/components/ui/field/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import ProfileEmailForm from "./profile-email-form.svelte";
-  import ProfileSettingsSection from "./profile-settings-section.svelte";
+  import SettingsSection from "$lib/components/settings-section.svelte";
 
   const id = $props.id();
 
@@ -27,7 +27,7 @@
     </p>
   </div>
 
-  <ProfileSettingsSection
+  <SettingsSection
     title="Current email"
     description="This is the address linked to your account today."
   >
@@ -67,7 +67,7 @@
         </FieldDescription>
       </Field>
     {/snippet}
-  </ProfileSettingsSection>
+  </SettingsSection>
 
   <ProfileEmailForm {currentEmail} />
 </div>

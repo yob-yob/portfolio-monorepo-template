@@ -13,7 +13,7 @@
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
-  import ProfileSettingsSection from "./profile-settings-section.svelte";
+  import SettingsSection from "$lib/components/settings-section.svelte";
 
   const id = $props.id();
 
@@ -81,7 +81,7 @@
   };
 </script>
 
-<ProfileSettingsSection
+<SettingsSection
   title="Profile"
   description="Update your display name and profile picture."
 >
@@ -148,4 +148,4 @@
   {#snippet footer()}
     <Button type="submit" form="profile-details-form">Save changes</Button>
   {/snippet}
-</ProfileSettingsSection>
+</SettingsSection>

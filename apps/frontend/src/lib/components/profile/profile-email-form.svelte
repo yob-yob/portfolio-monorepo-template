@@ -5,6 +5,7 @@
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
   import { refreshAll } from "$app/navigation";
+  import SettingsSection from "$lib/components/settings-section.svelte";
   import { Button } from "$lib/components/ui/button/index.js";
   import {
     Field,
@@ -14,7 +15,6 @@
     FieldLabel,
   } from "$lib/components/ui/field/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
-  import ProfileSettingsSection from "./profile-settings-section.svelte";
 
   type EmailChangeStep = "idle" | "request-change" | "new-otp";
 
@@ -323,7 +323,7 @@
   };
 </script>
 
-<ProfileSettingsSection
+<SettingsSection
   title="Change email"
   description="Changing your email takes three steps: verify your current inbox, choose a new address, then confirm the new inbox."
 >
@@ -553,4 +553,4 @@
       </div>
     </div>
   {/snippet}
-</ProfileSettingsSection>
+</SettingsSection>

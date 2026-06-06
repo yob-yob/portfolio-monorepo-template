@@ -13,7 +13,7 @@
   import TriangleAlertIcon from "@lucide/svelte/icons/triangle-alert";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-  import ProfileSettingsSection from "$lib/components/profile/profile-settings-section.svelte";
+  import SettingsSection from "$lib/components/settings-section.svelte";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
   import {
@@ -128,7 +128,7 @@
     </p>
   </div>
 
-  <ProfileSettingsSection
+  <SettingsSection
     title="Organization logo"
     description="Upload a logo that appears across your organization workspace."
   >
@@ -179,9 +179,9 @@
         Save logo
       </Button>
     {/snippet}
-  </ProfileSettingsSection>
+  </SettingsSection>
 
-  <ProfileSettingsSection
+  <SettingsSection
     title="Organization name"
     description="The display name shown to members and on shared resources."
   >
@@ -209,9 +209,9 @@
         Save name
       </Button>
     {/snippet}
-  </ProfileSettingsSection>
+  </SettingsSection>
 
-  <ProfileSettingsSection
+  <SettingsSection
     title="Organization slug"
     description="The URL-friendly identifier used in your organization's address."
   >
@@ -268,9 +268,9 @@
         Save slug
       </Button>
     {/snippet}
-  </ProfileSettingsSection>
+  </SettingsSection>
 
-  <ProfileSettingsSection
+  <SettingsSection
     title="Switch owner"
     description="Transfer organization ownership to another member."
   >
@@ -308,5 +308,5 @@
         Transfer ownership
       </Button>
     {/snippet}
-  </ProfileSettingsSection>
+  </SettingsSection>
 </div>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import FileTextIcon from "@lucide/svelte/icons/file-text";
-  import ProfileSettingsSection from "./profile-settings-section.svelte";
+  import SettingsSection from "$lib/components/settings-section.svelte";
 </script>
 
 <div class="space-y-6">
@@ -12,7 +12,7 @@
     </p>
   </div>
 
-  <ProfileSettingsSection
+  <SettingsSection
     title="Why accounts are retained"
     description="Activity in this system is logged and must stay aligned with our records."
   >
@@ -36,5 +36,5 @@
     <p class="text-muted-foreground mt-4 text-sm">
       If you need help with access changes, contact your administrator.
     </p>
-  </ProfileSettingsSection>
+  </SettingsSection>
 </div>

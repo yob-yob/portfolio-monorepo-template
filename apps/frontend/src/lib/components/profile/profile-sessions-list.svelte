@@ -8,7 +8,7 @@
   import * as Card from "$lib/components/ui/card/index.js";
   import { Separator } from "$lib/components/ui/separator/index.js";
   import { Skeleton } from "$lib/components/ui/skeleton/index.js";
-  import ProfileSettingsSection from "./profile-settings-section.svelte";
+  import SettingsSection from "$lib/components/settings-section.svelte";
 
   interface DisplaySession {
     browser: string;
@@ -200,7 +200,7 @@
   currentSessionStore.subscribe(async () => await loadSessions());
 </script>
 
-<ProfileSettingsSection
+<SettingsSection
   title="Sessions"
   description="Devices where you are currently signed in. Revoke any session you do not recognize."
 >
@@ -309,4 +309,4 @@
       </p>
     </div>
   {/snippet}
-</ProfileSettingsSection>
+</SettingsSection>
