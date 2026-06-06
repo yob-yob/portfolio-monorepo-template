@@ -32,5 +32,6 @@ export const load = async ({ locals, request, params }) => {
 
   return {
     activeOrganizationSlug: data.slug,
+    organizationName: data.name,
   };
 };
