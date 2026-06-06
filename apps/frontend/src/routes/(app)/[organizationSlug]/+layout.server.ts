@@ -50,5 +50,6 @@ export const load = async ({ locals, request, params }) => {
     userTeams: userTeamsData.filter(
       (team) => team.organizationId === getOrganizationData.id
     ),
+    organization: getOrganizationData,
   };
 };

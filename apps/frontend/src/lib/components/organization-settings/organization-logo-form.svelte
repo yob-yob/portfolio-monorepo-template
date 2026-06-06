@@ -2,6 +2,7 @@
   import CameraIcon from "@lucide/svelte/icons/camera";
   import { toast } from "svelte-sonner";
   import { authClient } from "@/auth/client";
+  import { isSupportedMimeType } from "@/backend/utils/constants/supported-mime-types";
   import { invalidateAll } from "$app/navigation";
   import { backend } from "$lib/api";
   import SettingsSection from "$lib/components/settings-section.svelte";
@@ -18,12 +19,12 @@
   let {
     organizationName,
     organizationId,
+    logoPreview,
   }: {
     organizationName: string;
     organizationId: string;
+    logoPreview: string | null | undefined;
   } = $props();
-
-  let logoPreview = $state<string | undefined>(undefined);
 
   const logoFallbackInitials = $derived(
     organizationName
@@ -34,10 +35,33 @@
       .toUpperCase() || "OR"
   );
 
-  const handleLogoChange = async (event: Event) => {
+  const handleLogoChange = (event: Event) => {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) {
+      return;
+    }
+    logoPreview = URL.createObjectURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    logoPreview = undefined;
+  };
+
+  const handleSubmit = async (event: Event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.target as HTMLFormElement);
+
+    const file = formData.get("logo") as File;
+
+    if (!file) {
+      toast.warning("No file selected");
+      return;
+    }
+
+    if (!isSupportedMimeType(file.type)) {
+      toast.warning(`Unsupported File Type: ${file.type}`);
       return;
     }
 
@@ -67,23 +91,14 @@
         `Failed to update organization logo: ${updateOrganizationLogoError.message}`
       );
 
-      // delete uploaded file!!!
+      // delete uploaded file if an error occurs!!!
 
       return;
     }
 
     invalidateAll();
 
-    logoPreview = URL.createObjectURL(file);
-  };
-
-  const handleRemoveLogo = () => {
-    logoPreview = undefined;
-  };
-
-  const handleSubmit = (event: Event) => {
-    event.preventDefault();
-    toast.success("Organization logo update saved (placeholder)");
+    toast.success("Organization logo update saved...");
   };
 </script>
 

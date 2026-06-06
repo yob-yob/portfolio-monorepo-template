@@ -40,7 +40,11 @@
     </p>
   </div>
 
-  <OrganizationLogoForm organizationName={data.organizationName} />
+  <OrganizationLogoForm
+    organizationName={data.organization.name}
+    organizationId={data.organization.id}
+    logoPreview={data.organization.logo ?? ""}
+  />
   <OrganizationNameForm organizationName={data.organizationName} />
   <OrganizationSlugForm organizationSlug={currentOrganizationSlug} />
   <OrganizationSwitchOwnerForm />
