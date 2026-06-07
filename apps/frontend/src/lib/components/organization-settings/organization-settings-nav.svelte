@@ -15,6 +15,7 @@
       teams: string;
       members: string;
       billing: string;
+      rbac: string;
     };
   } = $props();
 
@@ -42,6 +43,13 @@
       icon: MonitorSmartphoneIcon,
       match: (pathname: string) =>
         pathname === OrganizationSettingsRoutes.members,
+    },
+    {
+      href: OrganizationSettingsRoutes.rbac,
+      label: "Roles and Permissions",
+      description: "Manage your roles and permissions",
+      icon: Link2Icon,
+      match: (pathname: string) => pathname === OrganizationSettingsRoutes.rbac,
     },
     {
       href: OrganizationSettingsRoutes.billing,

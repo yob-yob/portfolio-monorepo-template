@@ -1,5 +1,10 @@
-import { emailOTPClient, organizationClient } from "better-auth/client/plugins";
+import {
+  emailOTPClient,
+  inferOrgAdditionalFields,
+  organizationClient,
+} from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/svelte";
+import type { AuthConfig } from "./auth.ts";
 
 export const authClient = createAuthClient({
   baseURL: "http://localhost:3000",
@@ -8,6 +13,7 @@ export const authClient = createAuthClient({
       teams: {
         enabled: true,
       },
+      schema: inferOrgAdditionalFields<AuthConfig>(),
     }),
     emailOTPClient(),
   ],

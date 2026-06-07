@@ -6,6 +6,7 @@
   import { OrganizationSettingsRoute } from "./+page.svelte";
   import { OrganizationBillingSettingsRoute } from "./billing/+page.svelte";
   import { OrganizationMembersSettingsRoute } from "./members/+page.svelte";
+  import { OrganizationRBACSettingsRoute } from "./rbac/+page.svelte";
   import { OrganizationTeamsSettingsRoute } from "./teams/+page.svelte";
 
   const { children, params } = $props();
@@ -27,6 +28,7 @@
     teams: OrganizationTeamsSettingsRoute(params.organizationSlug),
     members: OrganizationMembersSettingsRoute(params.organizationSlug),
     billing: OrganizationBillingSettingsRoute(params.organizationSlug),
+    rbac: OrganizationRBACSettingsRoute(params.organizationSlug),
   });
 </script>
 

@@ -1,8 +1,7 @@
-import { accounts, users } from "./schemas/auth.ts";
+import * as AuthSchema from "./schemas/auth.ts";
 
-export const table = {
-  users,
-  accounts,
+export const schema = {
+  ...AuthSchema,
 } as const;
 
-export type Table = typeof table;
+export type Schema = typeof schema;

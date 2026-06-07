@@ -10,9 +10,11 @@
   import SettingsSection from "$lib/components/settings-section.svelte";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
+  import Skeleton from "../ui/skeleton/skeleton.svelte";
 
   interface TeamData {
     createdAt: Date | string;
+    createdBy: string;
     id: string;
     name: string;
   }
@@ -67,6 +69,31 @@
     userTeams.some((userTeam) => userTeam.id === team.id);
 
   const isActiveTeam = (team: TeamData) => activeTeamId === team.id;
+
+  type CreatorLookup = ReturnType<
+    typeof authClient.organization.getActiveMember
+  >;
+
+  const creatorCache = new Map<string, CreatorLookup>();
+
+  const getCreatorName = (creatorUserId: string) => {
+    // cache the result...
+    const cached = creatorCache.get(creatorUserId);
+
+    if (cached) {
+      return cached;
+    }
+
+    const request = authClient.organization.getActiveMember({
+      query: {
+        creatorUserId,
+      },
+    });
+
+    creatorCache.set(creatorUserId, request);
+
+    return request;
+  };
 
   const switchTeam = async (team: TeamData) => {
     const { error } = await authClient.organization.setActiveTeam({
@@ -185,9 +212,17 @@
                     </span>
                   {/if}
                 </div>
-                <p class="text-muted-foreground text-sm">
+                <div class="text-muted-foreground text-sm">
                   Created {formatRelativeTime(team.createdAt)}
-                </p>
+                  {#await getCreatorName(team.createdBy)}
+                    <Skeleton class="h-2 w-[100px] inline-block" />
+                  {:then creator}
+                    by {creator.data?.user.name}
+                  {:catch error}
+                    {@debug error}
+                    by Unknown
+                  {/await}
+                </div>
               </div>
             </div>
 

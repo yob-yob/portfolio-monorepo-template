@@ -70,6 +70,8 @@ export const teams = pgTable(
     updatedAt: timestamp("updated_at").$onUpdate(
       () => /* @__PURE__ */ new Date()
     ),
+    description: text("description").default(""),
+    createdBy: text("created_by").notNull(),
   },
   (table) => [index("teams_organizationId_idx").on(table.organizationId)]
 );

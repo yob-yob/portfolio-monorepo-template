@@ -6,9 +6,9 @@
     "./node/db": "./src/node-db.ts"
   },
   "scripts": {
-    "db:generate": "bun run drizzle-kit generate",
-    "db:migrate": "bun run drizzle-kit migrate",
-    "db:check": "bun run drizzle-kit check"
+    "db:generate": "bunx drizzle-kit generate --config ./drizzle.config.ts",
+    "db:migrate": "bunx drizzle-kit migrate --config ./drizzle.config.ts",
+    "db:check": "bunx drizzle-kit check --config ./drizzle.config.ts"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^3.3.0",

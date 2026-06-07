@@ -19,11 +19,11 @@ if (!process.env.DATABASE_URL) {
 }
 
 if (!process.env.DOMAIN) {
-  if (process.env.APP_ENV === "development") {
-    console.warn("Development mode detected: Only Allowing localhost:*");
-  } else {
+  if (process.env.APP_ENV === "Production") {
     throw new Error("DOMAIN is not set");
   }
+
+  console.warn("Development mode detected: Only Allowing localhost:*");
 } else if (
   process.env.DOMAIN.startsWith("http://") ||
   process.env.DOMAIN.startsWith("https://")
@@ -37,7 +37,7 @@ const redis = new Redis({
   db: 3,
 });
 
-export default betterAuth({
+const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: authSchema,
@@ -50,7 +50,7 @@ export default betterAuth({
   }),
   baseURL: {
     allowedHosts: [
-      ...(process.env.APP_ENV === "development" ? ["localhost:*"] : []),
+      ...(process.env.APP_ENV === "production" ? [] : ["localhost:*"]),
       ...(process.env.DOMAIN
         ? [`${process.env.DOMAIN}`, `*.${process.env.DOMAIN}`]
         : []),
@@ -83,3 +83,7 @@ export default betterAuth({
     },
   },
 });
+
+export default auth;
+
+export type AuthConfig = typeof auth;
