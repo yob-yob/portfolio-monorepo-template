@@ -19,7 +19,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 if (!process.env.DOMAIN) {
-  if (process.env.APP_ENV === "Production") {
+  if (process.env.APP_ENV === "production") {
     throw new Error("DOMAIN is not set");
   }
 
@@ -31,11 +31,26 @@ if (!process.env.DOMAIN) {
   throw new Error("DOMAIN should not have HTTP:// or HTTPS:// prefixes");
 }
 
-const redis = new Redis({
-  host: "localhost",
-  port: 6379,
-  db: 3,
-});
+function createRedisClient(): Redis {
+  if (process.env.REDIS_URL) {
+    return new Redis(process.env.REDIS_URL);
+  }
+
+  const port = Number(process.env.REDIS_PORT ?? 6379);
+  const db = Number(process.env.REDIS_DB ?? 3);
+
+  if (Number.isNaN(port) || Number.isNaN(db)) {
+    throw new Error("REDIS_PORT and REDIS_DB must be valid numbers");
+  }
+
+  return new Redis({
+    host: process.env.REDIS_HOST ?? "localhost",
+    port,
+    db,
+  });
+}
+
+const redis = createRedisClient();
 
 const auth = betterAuth({
   database: drizzleAdapter(db, {
