@@ -6,7 +6,7 @@ import {
 import { createAuthClient } from "better-auth/svelte";
 import type { AuthConfig } from "./auth.ts";
 
-const baseURL = import.meta.env.PUBLIC_API_URL ?? "http://localhost:3000";
+const baseURL = import.meta.env.VITE_PUBLIC_API_URL ?? "http://localhost:3000";
 
 console.log("env variables:", import.meta.env);
 console.log("AuthClient BaseURL:", baseURL);
