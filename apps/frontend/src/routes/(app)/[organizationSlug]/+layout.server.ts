@@ -11,6 +11,11 @@ export const load = async ({ locals, request, params }) => {
     redirect(307, "/select-organization");
   }
 
+  if (!locals.session.activeTeamId) {
+    // Redirect to organization selection page
+    redirect(307, "/select-organization");
+  }
+
   const { data: getOrganizationData, error: getOrganizationError } =
     await authClient.organization.getFullOrganization({
       query: {
@@ -47,9 +52,10 @@ export const load = async ({ locals, request, params }) => {
   return {
     activeOrganizationSlug: getOrganizationData.slug,
     organizationName: getOrganizationData.name,
+    activeTeamId: locals.session.activeTeamId,
     userTeams: userTeamsData.filter(
       (team) => team.organizationId === getOrganizationData.id
-    ),
+    ), // filter to only show this user's organization
     organization: getOrganizationData,
   };
 };

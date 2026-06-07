@@ -11,6 +11,11 @@ export const load = async ({ locals, request }) => {
     redirect(307, "/select-organization");
   }
 
+  if (!locals.session.activeTeamId) {
+    // Redirect to organization selection page
+    redirect(307, "/select-organization");
+  }
+
   const { data: getOrganizationData, error: getOrganizationError } =
     await authClient.organization.getFullOrganization({
       query: {
@@ -46,6 +51,7 @@ export const load = async ({ locals, request }) => {
 
   return {
     activeOrganizationSlug: getOrganizationData.slug,
+    activeTeamId: locals.session.activeTeamId,
     userTeams: userTeamsData.filter(
       (team) => team.organizationId === getOrganizationData.id
     ),

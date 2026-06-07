@@ -39,7 +39,9 @@
   <AppSidebar
     user={data.user}
     activeOrganizationSlug={data.activeOrganizationSlug}
+    activeTeamId={data.session.activeTeamId}
     teams={data.userTeams.map((team) => ({
+      id: team.id,
       logo: "",
       name: team.name,
       plan: "FREE",

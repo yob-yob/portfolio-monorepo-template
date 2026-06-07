@@ -1,4 +1,4 @@
-<!-- Organization general settings page  -->
+<!-- Organization teams settings page -->
 <script lang="ts" module>
   import { resolve } from "$app/paths";
 
@@ -10,9 +10,11 @@
 
 <script lang="ts">
   import { onMount } from "svelte";
+  import OrganizationCreateTeamForm from "$lib/components/organization-settings/organization-create-team-form.svelte";
+  import OrganizationTeamsList from "$lib/components/organization-settings/organization-teams-list.svelte";
   import { breadcrumbs } from "$lib/composables/breadcrumbs.svelte";
 
-  const { params } = $props();
+  const { params, data } = $props();
 
   onMount(() => {
     const OrgTeamSettings = breadcrumbs.addCrumb({
@@ -27,4 +29,20 @@
   });
 </script>
 
-<h1>Organization Team Settings</h1>
+<div class="space-y-6">
+  <div class="space-y-1">
+    <h2 class="text-2xl font-semibold tracking-tight">Teams</h2>
+    <p class="text-muted-foreground text-sm">
+      Manage teams in your organization, switch workspaces, and create new
+      teams.
+    </p>
+  </div>
+
+  <OrganizationTeamsList
+    teams={data.organization.teams}
+    userTeams={data.userTeams}
+    activeTeamId={data.session.activeTeamId}
+    userId={data.user.id}
+  />
+  <OrganizationCreateTeamForm />
+</div>

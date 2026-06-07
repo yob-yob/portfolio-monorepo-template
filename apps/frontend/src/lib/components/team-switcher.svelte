@@ -6,6 +6,7 @@
   import { useSidebar } from "$lib/components/ui/sidebar/index.js";
 
   interface Teams {
+    id: string;
     logo: string;
     name: string;
     plan: string;
@@ -13,12 +14,16 @@
 
   let {
     teams = $bindable<Teams[]>(),
+    activeTeamId = $bindable<string>(),
   }: {
     teams: Teams[];
+    activeTeamId: string;
   } = $props();
   const sidebar = useSidebar();
 
-  let activeTeam = $derived.by(() => teams[0]);
+  let activeTeam = $derived.by(() =>
+    teams.find((team) => team.id === activeTeamId)
+  );
 </script>
 
 <Sidebar.Menu>

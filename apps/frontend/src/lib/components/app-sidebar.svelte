@@ -39,6 +39,7 @@
   import TeamSwitcher from "./team-switcher.svelte";
 
   interface Teams {
+    id: string;
     logo: string;
     name: string;
     plan: string;
@@ -49,11 +50,13 @@
     collapsible = "icon",
     user = $bindable<User>(),
     activeOrganizationSlug = $bindable<string>(),
+    activeTeamId = $bindable<string>(),
     teams = $bindable<Teams[]>(),
     ...restProps
   }: ComponentProps<typeof Sidebar.Root> & {
     user: User;
     activeOrganizationSlug: string;
+    activeTeamId: string;
     teams: Teams[];
   } = $props();
 
@@ -115,7 +118,7 @@
 
 <Sidebar.Root bind:ref {collapsible} {...restProps}>
   <Sidebar.Header>
-    <TeamSwitcher {teams} />
+    <TeamSwitcher {teams} {activeTeamId} />
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={navMain} {dashboardUrl} />
