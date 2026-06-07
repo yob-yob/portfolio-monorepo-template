@@ -32,6 +32,7 @@
   import { OrganizationSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/+page.svelte";
   import { OrganizationBillingSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/billing/+page.svelte";
   import { OrganizationMembersSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/members/+page.svelte";
+  import { OrganizationRBACSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/rbac/+page.svelte";
   import { OrganizationTeamsSettingsRoute } from "../../routes/(app)/[organizationSlug]/settings/teams/+page.svelte";
   import NavMain from "./nav-main.svelte";
   import NavProjects from "./nav-projects.svelte";
@@ -39,10 +40,10 @@
   import TeamSwitcher from "./team-switcher.svelte";
 
   interface Teams {
+    color: string;
+    description: string;
     id: string;
-    logo: string;
     name: string;
-    plan: string;
   }
 
   let {
@@ -108,6 +109,10 @@
           url: OrganizationMembersSettingsRoute(activeOrganizationSlug),
         },
         {
+          title: "Roles and Permissions",
+          url: OrganizationRBACSettingsRoute(activeOrganizationSlug),
+        },
+        {
           title: "Billing",
           url: OrganizationBillingSettingsRoute(activeOrganizationSlug),
         },
@@ -118,7 +123,11 @@
 
 <Sidebar.Root bind:ref {collapsible} {...restProps}>
   <Sidebar.Header>
-    <TeamSwitcher {teams} {activeTeamId} />
+    <TeamSwitcher
+      {teams}
+      {activeTeamId}
+      organizationSlug={activeOrganizationSlug}
+    />
   </Sidebar.Header>
   <Sidebar.Content>
     <NavMain items={navMain} {dashboardUrl} />

@@ -15,6 +15,7 @@
   const id = $props.id();
 
   let teamName = $state("");
+  let teamDescription = $state("");
 
   const handleSubmit = async (event: Event) => {
     event.preventDefault();
@@ -26,6 +27,8 @@
 
     const { error } = await authClient.organization.createTeam({
       name: teamName,
+      description: teamDescription,
+      color: `#${Math.floor(Math.random() * 16_777_215).toString(16)}`,
     });
 
     if (error) {
@@ -38,6 +41,7 @@
     toast.success(`New team created: ${teamName}`);
     invalidateAll();
     teamName = "";
+    teamDescription = "";
   };
 </script>
 
@@ -54,11 +58,24 @@
             id="team-name-{id}"
             name="teamName"
             bind:value={teamName}
-            placeholder="Engineering"
+            placeholder="Example: Engineering"
             autocomplete="off"
           />
           <FieldDescription>
             Choose a short, recognizable name for this team.
+          </FieldDescription>
+        </Field>
+        <Field>
+          <FieldLabel for="team-description-{id}">Team description</FieldLabel>
+          <Input
+            id="team-description-{id}"
+            name="teamDescription"
+            bind:value={teamDescription}
+            placeholder="Example: Engineering Operations Team"
+            autocomplete="off"
+          />
+          <FieldDescription>
+            What's the purpose of this team?
           </FieldDescription>
         </Field>
       </FieldGroup>

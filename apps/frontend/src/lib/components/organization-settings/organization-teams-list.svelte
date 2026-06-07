@@ -10,8 +10,11 @@
   import { invalidateAll } from "$app/navigation";
   import SettingsSection from "$lib/components/settings-section.svelte";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
-  import { Button } from "$lib/components/ui/button/index.js";
+  import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
+  import * as Dialog from "$lib/components/ui/dialog/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+  import { Input } from "$lib/components/ui/input/index.js";
+  import { Label } from "$lib/components/ui/label/index.js";
   import Skeleton from "../ui/skeleton/skeleton.svelte";
 
   interface TeamData {
@@ -147,10 +150,44 @@
     invalidateAll();
   };
 
-  const deleteTeam = async (team: TeamData) => {
+  let deleteDialogOpen = $state(false);
+  let teamToDelete = $state<TeamData | null>(null);
+  let deleteConfirmationName = $state("");
+  let isDeletingTeam = $state(false);
+
+  const deleteConfirmationMatches = $derived(
+    teamToDelete !== null && deleteConfirmationName === teamToDelete.name
+  );
+
+  const openDeleteDialog = (team: TeamData) => {
+    teamToDelete = team;
+    deleteConfirmationName = "";
+    deleteDialogOpen = true;
+  };
+
+  const closeDeleteDialog = () => {
+    deleteDialogOpen = false;
+    teamToDelete = null;
+    deleteConfirmationName = "";
+  };
+
+  const confirmDeleteTeam = async () => {
+    if (teamToDelete === null) {
+      return;
+    }
+
+    if (!deleteConfirmationMatches) {
+      return;
+    }
+
+    isDeletingTeam = true;
+
+    const team = teamToDelete;
     const { error } = await authClient.organization.removeTeam({
       teamId: team.id,
     });
+
+    isDeletingTeam = false;
 
     if (error) {
       toast.error(
@@ -160,6 +197,7 @@
     }
 
     toast.success(`Team Deleted: ${team.name}`);
+    closeDeleteDialog();
     invalidateAll();
   };
 </script>
@@ -275,7 +313,7 @@
 
                 <DropdownMenu.Item
                   variant="destructive"
-                  onSelect={() => deleteTeam(team)}
+                  onSelect={() => openDeleteDialog(team)}
                 >
                   <Trash2Icon />
                   Delete
@@ -288,3 +326,52 @@
     {/if}
   {/snippet}
 </SettingsSection>
+
+<Dialog.Root
+  open={deleteDialogOpen}
+  onOpenChange={(open) => {
+    if (!open) {
+      closeDeleteDialog();
+    }
+  }}
+>
+  <Dialog.Content class="sm:max-w-md">
+    <Dialog.Header>
+      <Dialog.Title>Delete team</Dialog.Title>
+      <Dialog.Description>
+        This action cannot be undone. Type
+        <span class="text-foreground font-medium">{teamToDelete?.name}</span>
+        to confirm.
+      </Dialog.Description>
+    </Dialog.Header>
+
+    <div class="grid gap-3">
+      <Label for="delete-team-confirmation">Team name</Label>
+      <Input
+        id="delete-team-confirmation"
+        bind:value={deleteConfirmationName}
+        placeholder={teamToDelete?.name ?? "Team name"}
+        autocomplete="off"
+        disabled={isDeletingTeam}
+      />
+    </div>
+
+    <Dialog.Footer>
+      <Dialog.Close
+        type="button"
+        class={buttonVariants({ variant: "outline" })}
+        disabled={isDeletingTeam}
+      >
+        Cancel
+      </Dialog.Close>
+      <Button
+        type="button"
+        variant="destructive"
+        disabled={!deleteConfirmationMatches || isDeletingTeam}
+        onclick={confirmDeleteTeam}
+      >
+        Delete team
+      </Button>
+    </Dialog.Footer>
+  </Dialog.Content>
+</Dialog.Root>

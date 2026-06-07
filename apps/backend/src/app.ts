@@ -7,6 +7,9 @@ import { storage } from "@/backend/modules/storage/index.ts";
 
 // Initializing the APP
 export const app = new Elysia()
+  .onRequest(({ request }) => {
+    console.log(`Handling: ${request.url}`);
+  })
   .use(
     openapi({
       documentation: {

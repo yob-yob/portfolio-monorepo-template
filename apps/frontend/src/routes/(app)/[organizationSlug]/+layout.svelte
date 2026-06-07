@@ -29,12 +29,12 @@
   <AppSidebar
     user={data.user}
     activeOrganizationSlug={params.organizationSlug}
-    activeTeamId={data.session.activeTeamId}
+    activeTeamId={data.activeTeamId}
     teams={data.userTeams.map((team) => ({
         id: team.id,
         logo: "",
         name: team.name,
-        plan: "FREE",
+        description: team.description,
       }))}
   />
   <Sidebar.Inset>
