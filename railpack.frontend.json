@@ -2,7 +2,10 @@
   "$schema": "https://schema.railpack.com",
   "provider": "node",
   "packages": {
-    "bun": "latest"
+    "bun": "1.3.14"
+  },
+  "builder": {
+    "image": "ghcr.io/railwayapp/railpack-builder@sha256:2c8836d4f634e4165d45d37383a0364679e20fe6998ddcd93e1252583037bed3"
   },
   "steps": {
     "build": {

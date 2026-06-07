@@ -144,7 +144,7 @@ Copy and configure environment variables for the backend. See `apps/backend/.env
 | `DOMAIN` | Application domain (required in production) |
 | `APP_URL` | Public URL used when generating storage paths |
 
-The frontend expects `PUBLIC_API_URL` (SvelteKit public env) pointing at the backend, e.g. `http://localhost:3000`.
+The frontend expects `VITE_PUBLIC_API_URL` (SvelteKit public env) pointing at the backend, e.g. `http://localhost:3000`.
 
 ### Install & Run
 
