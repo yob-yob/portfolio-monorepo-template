@@ -1,0 +1,15 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "provider": "node",
+  "packages": {
+    "bun": "latest"
+  },
+  "steps": {
+    "build": {
+      "commands": ["bun run --cwd apps/backend build"]
+    }
+  },
+  "deploy": {
+    "startCommand": "./apps/backend/dist/backend_server"
+  }
+}
