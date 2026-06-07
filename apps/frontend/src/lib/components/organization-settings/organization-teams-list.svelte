@@ -1,5 +1,6 @@
 <script lang="ts">
   import ArrowRightLeftIcon from "@lucide/svelte/icons/arrow-right-left";
+  import EllipsisIcon from "@lucide/svelte/icons/ellipsis";
   import LogInIcon from "@lucide/svelte/icons/log-in";
   import LogOutIcon from "@lucide/svelte/icons/log-out";
   import Trash2Icon from "@lucide/svelte/icons/trash-2";
@@ -10,6 +11,7 @@
   import SettingsSection from "$lib/components/settings-section.svelte";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
   import { Button } from "$lib/components/ui/button/index.js";
+  import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import Skeleton from "../ui/skeleton/skeleton.svelte";
 
   interface TeamData {
@@ -226,51 +228,60 @@
               </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2 sm:justify-end">
-              {#if userIsAMemberOfTeam(team) && !isActiveTeam(team)}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onclick={() => switchTeam(team)}
-                >
-                  <ArrowRightLeftIcon />
-                  Switch
-                </Button>
-              {/if}
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger>
+                {#snippet child({ props })}
+                  <Button
+                    {...props}
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    class="shrink-0"
+                  >
+                    <EllipsisIcon />
+                    <span class="sr-only">Team actions for {team.name}</span>
+                  </Button>
+                {/snippet}
+              </DropdownMenu.Trigger>
 
-              {#if !userIsAMemberOfTeam(team)}
-                <Button
-                  type="button"
-                  variant="default"
-                  size="sm"
-                  onclick={() => joinTeam(team)}
-                >
-                  <LogInIcon />
-                  Join
-                </Button>
-              {:else}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onclick={() => leaveTeam(team)}
-                >
-                  <LogOutIcon />
-                  Leave
-                </Button>
-              {/if}
+              <DropdownMenu.Content align="end" class="w-44">
+                {#if userIsAMemberOfTeam(team) && !isActiveTeam(team)}
+                  <DropdownMenu.Item onSelect={() => switchTeam(team)}>
+                    <ArrowRightLeftIcon />
+                    Switch
+                  </DropdownMenu.Item>
+                {/if}
 
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onclick={() => deleteTeam(team)}
-              >
-                <Trash2Icon />
-                Delete
-              </Button>
-            </div>
+                {#if !userIsAMemberOfTeam(team)}
+                  <DropdownMenu.Item onSelect={() => joinTeam(team)}>
+                    <LogInIcon />
+                    Join
+                  </DropdownMenu.Item>
+                {/if}
+
+                {#if !userIsAMemberOfTeam(team) || (userIsAMemberOfTeam(team) && !isActiveTeam(team))}
+                  <DropdownMenu.Separator />
+                {/if}
+
+                {#if userIsAMemberOfTeam(team)}
+                  <DropdownMenu.Item
+                    onSelect={() => leaveTeam(team)}
+                    class="text-amber-600 focus:text-amber-600 focus:bg-amber-500/10 dark:text-amber-400 dark:focus:bg-amber-500/15 dark:focus:text-amber-400 [&_svg]:text-amber-600 dark:[&_svg]:text-amber-400"
+                  >
+                    <LogOutIcon />
+                    Leave
+                  </DropdownMenu.Item>
+                {/if}
+
+                <DropdownMenu.Item
+                  variant="destructive"
+                  onSelect={() => deleteTeam(team)}
+                >
+                  <Trash2Icon />
+                  Delete
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
           </li>
         {/each}
       </ul>

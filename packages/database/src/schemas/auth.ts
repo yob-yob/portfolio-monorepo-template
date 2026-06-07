@@ -71,6 +71,7 @@ export const teams = pgTable(
       () => /* @__PURE__ */ new Date()
     ),
     description: text("description").default(""),
+    color: text("color").default(""),
     createdBy: text("created_by").notNull(),
   },
   (table) => [index("teams_organizationId_idx").on(table.organizationId)]
