@@ -51,23 +51,6 @@
     logoPreview = undefined;
   };
 
-  const handleUpdateOrganizationLogo = async (path: string) => {
-    const { error } = await authClient.organization.update({
-      data: { logo: path },
-    });
-
-    if (error) {
-      toast.error(`Failed to update organization logo: ${error.message}`);
-      return false;
-    }
-
-    invalidateAll();
-
-    toast.success("Organization logo update saved...");
-
-    return true;
-  };
-
   const handleSubmit = async (event: Event) => {
     event.preventDefault();
 
@@ -101,7 +84,22 @@
       (message: string) => toast.error(`Failed to upload logo: ${message}`),
       (message: string) =>
         toast.error(`Failed to update organization logo: ${message}`),
-      handleUpdateOrganizationLogo
+      async (path: string) => {
+        const { error } = await authClient.organization.update({
+          data: { logo: path },
+        });
+
+        if (error) {
+          toast.error(`Failed to update organization logo: ${error.message}`);
+          return false;
+        }
+
+        invalidateAll();
+
+        toast.success("Organization logo update saved...");
+
+        return true;
+      }
     );
   };
 </script>
