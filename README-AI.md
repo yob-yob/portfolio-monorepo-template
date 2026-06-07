@@ -4,7 +4,7 @@ A production-oriented **multi-tenant SaaS starter** built as a Bun monorepo. Cit
 
 > **Note:** This repository is primarily an educational and reference project for studying modern tooling and patterns. It is intended as a reusable base template for future multi-tenant applications.
 
-> **FYI:** Project is mostly written by Hand... the only time AI has helped me is on the UI design and improvements and project documentation as well... other than that the AI is ALWAYS in `ASK` mode
+> **FYI:** Project is mostly written by Hand... the only time AI has helped me is on the UI design and improvements and project documentation and commit messages... other than that the AI is ALWAYS in `ASK` mode
 
 ---
 
