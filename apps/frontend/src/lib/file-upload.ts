@@ -8,10 +8,23 @@ interface FileUploadData {
   versioned: boolean | undefined;
 }
 
+interface uploadedFiles {
+  fileName: string;
+  path: string;
+}
+
+interface skippedFiles {
+  fileName: string;
+  reason: string;
+}
+
 type onUploadRequestError = (message: string) => void;
 type onUploadError = (message: string) => void;
 type onUploadSuccess = (path: string) => Promise<boolean>;
-type onUploadFilesSkipped = (fileName: string) => Promise<boolean>;
+type onUploadFilesSkipped = (
+  fileName: string,
+  reason: string
+) => Promise<boolean>;
 
 export const uploadFiles = async (
   contextType: "organization" | "user",
@@ -20,9 +33,13 @@ export const uploadFiles = async (
   files: FileUploadData[],
   onUploadRequestError: onUploadRequestError,
   onUploadError: onUploadError,
-  onUploadSuccess: onUploadSuccess,
-  onUploadFilesSkipped: onUploadFilesSkipped = () => Promise.resolve(false)
-) => {
+  onUploadSuccess: onUploadSuccess = () => Promise.resolve(true),
+  onUploadFilesSkipped: onUploadFilesSkipped = () => Promise.resolve(true)
+): Promise<{
+  uploadedFiles?: Set<uploadedFiles>;
+  skippedFiles?: Set<skippedFiles>;
+  error?: string;
+}> => {
   // Get Upload URL to upload the Logo file directly to s3...
   const { data: uploadLogoData, error: uploadLogoError } =
     await backend.storage.upload.post({
@@ -41,15 +58,18 @@ export const uploadFiles = async (
 
   if (uploadLogoError) {
     onUploadRequestError(uploadLogoError.value.message ?? "Unknown Error");
-    return;
+    return { error: uploadLogoError.value.message ?? "Unknown Error" };
   }
+
+  const uploadedFiles = new Set<uploadedFiles>();
+  const skippedFiles = new Set<skippedFiles>();
 
   for (const { url, path, fileName } of uploadLogoData.fileUploadUrls) {
     const file = files.find((file) => file.name === fileName);
 
     if (!file) {
       onUploadError("File not found");
-      return;
+      continue;
     }
 
     const fileUploadResponse = await fetch(url, {
@@ -59,14 +79,25 @@ export const uploadFiles = async (
 
     if (fileUploadResponse.ok) {
       await onUploadSuccess(path);
+      uploadedFiles.add({
+        path,
+        fileName,
+      });
     } else {
       onUploadError(JSON.stringify(await fileUploadResponse.json()));
     }
   }
 
-  for (const { fileName } of uploadLogoData.skippedFiles) {
-    onUploadFilesSkipped(fileName);
+  for (const { fileName, reason } of uploadLogoData.skippedFiles) {
+    await onUploadFilesSkipped(fileName, reason);
+    skippedFiles.add({
+      fileName,
+      reason,
+    });
   }
 
-  return;
+  return {
+    uploadedFiles,
+    skippedFiles,
+  };
 };
