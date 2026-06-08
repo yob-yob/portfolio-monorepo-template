@@ -19,10 +19,8 @@ export function slugify(text: string) {
  * not the incoming request's host.
  */
 export function getHeadersCookieAndAuthorizationValues(headers: Headers) {
-  const cookie = headers.get("cookie");
-  const authorization = headers.get("authorization");
   return {
-    cookie: cookie ?? "",
-    authorization: authorization ?? "",
+    cookie: headers.get("cookie") ?? "",
+    authorization: headers.get("authorization") ?? "",
   };
 }
