@@ -1,10 +1,11 @@
 import { authClient } from "@city-os/auth/client";
+import { getHeadersCookieAndAuthorizationValues } from "$lib/helpers";
 
 export async function handle({ event, resolve }) {
   // Fetch current session from Better Auth
   const session = await authClient.getSession({
     fetchOptions: {
-      headers: event.request.headers,
+      headers: getHeadersCookieAndAuthorizationValues(event.request.headers),
     },
   });
 

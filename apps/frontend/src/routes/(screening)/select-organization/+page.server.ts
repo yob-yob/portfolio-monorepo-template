@@ -1,11 +1,12 @@
 import { authClient } from "@/auth/client";
+import { getHeadersCookieAndAuthorizationValues } from "$lib/helpers.js";
 
 export const load = async ({ request }) => {
   //
   const { data: organizations, error: organizationsError } =
     await authClient.organization.list({
       fetchOptions: {
-        headers: request.headers,
+        headers: getHeadersCookieAndAuthorizationValues(request.headers),
       },
     });
 
@@ -16,7 +17,7 @@ export const load = async ({ request }) => {
   const { data: teams, error: teamsError } =
     await authClient.organization.listUserTeams({
       fetchOptions: {
-        headers: request.headers,
+        headers: getHeadersCookieAndAuthorizationValues(request.headers),
       },
     });
 

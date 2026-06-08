@@ -1,5 +1,6 @@
 import { error, redirect } from "@sveltejs/kit";
 import { authClient } from "@/auth/client";
+import { getHeadersCookieAndAuthorizationValues } from "$lib/helpers.js";
 
 export const load = async ({ locals, request }) => {
   if (!(locals.user && locals.session)) {
@@ -23,7 +24,7 @@ export const load = async ({ locals, request }) => {
         membersLimit: 0, // we don't need this...
       },
       fetchOptions: {
-        headers: request.headers,
+        headers: getHeadersCookieAndAuthorizationValues(request.headers),
       },
     });
 
@@ -38,7 +39,7 @@ export const load = async ({ locals, request }) => {
   const { data: userTeamsData, error: userTeamsError } =
     await authClient.organization.listUserTeams({
       fetchOptions: {
-        headers: request.headers,
+        headers: getHeadersCookieAndAuthorizationValues(request.headers),
       },
     });
 
