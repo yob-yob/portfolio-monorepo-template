@@ -81,6 +81,10 @@ const auth = betterAuth({
     database: {
       generateId: () => createId(),
     },
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: process.env.DOMAIN, // your domain
+    },
   },
   session: {
     preserveSessionInDatabase: true,
@@ -97,6 +101,11 @@ const auth = betterAuth({
       enabled: false,
     },
   },
+  trustedOrigins: process.env.TRUSTED_DOMAIN
+    ? process.env.TRUSTED_DOMAIN.trim()
+        .split(",")
+        .map((domain) => domain.trim())
+    : undefined,
 });
 
 export default auth;
