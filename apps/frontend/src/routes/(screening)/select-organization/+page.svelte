@@ -6,11 +6,11 @@
   import DarkModeToggle from "$lib/components/dark-mode-toggle.svelte";
   import OrganizationTeamCombobox from "$lib/components/organization-team-combobox.svelte";
   import { Button } from "$lib/components/ui/button/index.js";
+  import { Skeleton } from "$lib/components/ui/skeleton/index.js";
+
+  // import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
 
   const { data } = $props();
-
-  let activatingOrganizationId = $state<string | null>(null);
-  let selectedTeamIds = $state<Record<string, string>>({});
 
   interface Organization {
     id: string;
@@ -23,6 +23,12 @@
     name: string;
     organizationId: string;
   }
+
+  let activatingOrganizationId = $state<string | null>(null);
+  let selectedTeamIds = $state<Record<string, string>>({});
+
+  const organizations = authClient.useListOrganizations();
+  const teams = authClient.organization.listUserTeams();
 
   const activeOrganizationId = $derived(
     data.session?.activeOrganizationId ?? null
@@ -108,47 +114,43 @@
     <DarkModeToggle />
   </div>
 
-  {#if data.organizations === null}
-    <div class="w-full max-w-sm md:max-w-3xl">
-      <div class="bg-card text-card-foreground rounded-xl border p-6 shadow-sm">
-        <div class="flex items-start gap-3">
-          <span
-            class="border-primary/30 border-t-primary mt-0.5 size-5 animate-spin rounded-full border-2"
-            aria-hidden="true"
-          ></span>
-          <div class="space-y-1">
-            <p class="font-semibold">Loading organizations</p>
-            <p class="text-muted-foreground text-sm">
-              Fetching your available organizations...
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  {:else if data.organizations?.length === 0}
-    <div class="w-full max-w-sm md:max-w-3xl">
-      <div
-        class="bg-card text-card-foreground rounded-xl border p-6 text-center shadow-sm"
-      >
-        <p class="font-semibold">No organizations found</p>
-        <p class="text-muted-foreground mt-1 text-sm">
-          You do not have access to any organizations yet.
-        </p>
-      </div>
-    </div>
-  {:else}
-    <div class="w-full max-w-sm space-y-3 md:max-w-3xl">
-      <h1 class="text-2xl font-semibold tracking-tight"
-        >Select an organization</h1
-      >
-      <p class="text-muted-foreground text-sm">
-        Choose a team, then open the organization to continue.
-      </p>
+  <div class="w-full max-w-sm space-y-3 md:max-w-3xl">
+    <h1 class="text-2xl font-semibold tracking-tight"
+      >Select an organization</h1
+    >
+    <p class="text-muted-foreground text-sm">
+      Choose a team, then open the organization to continue.
+    </p>
 
+    {#if $organizations.isPending}
       <ul class="space-y-3">
-        {#each data.organizations as organization (organization.id)}
+        {#each Array.from({ length: 2 }) as _, index (index)}
+          <li>
+            <Skeleton class="h-18 w-full bg-card" />
+          </li>
+        {/each}
+      </ul>
+    {:else if $organizations.data && $organizations.data.length === 0}
+      <div
+        class="bg-card text-card-foreground rounded-xl border p-5 shadow-sm text-center space-y-5"
+      >
+        <div class="text-muted-foreground px-4 text-sm">
+          You do not have access to any organizations yet. would you like to
+          create one?
+        </div>
+        <Button
+          variant="default"
+          size="lg"
+          onclick={() => goto(resolve("/(screening)/onboarding"))}
+        >
+          Create an organization
+        </Button>
+      </div>
+    {:else}
+      <ul class="space-y-3">
+        {#each $organizations.data as organization (organization.id)}
           {@const organizationTeams =
-            teamsByOrganizationId.get(organization.id) ?? []}
+              teamsByOrganizationId.get(organization.id) ?? []}
           {@const selectedTeamId = selectedTeamForOrganization(organization.id)}
           {@const isActive = isActiveOrganization(organization.id)}
           <li>
@@ -186,11 +188,11 @@
                       organizationName={organization.name}
                       disabled={activatingOrganizationId === organization.id}
                       onValueChange={(teamId) => {
-                        selectedTeamIds = {
-                          ...selectedTeamIds,
-                          [organization.id]: teamId,
-                        };
-                      }}
+                          selectedTeamIds = {
+                            ...selectedTeamIds,
+                            [organization.id]: teamId,
+                          };
+                        }}
                     />
                   {/if}
 
@@ -200,13 +202,13 @@
                     size="sm"
                     class="shrink-0"
                     disabled={activatingOrganizationId === organization.id ||
-                      !selectedTeamId}
+                        !selectedTeamId}
                     onclick={() =>
-                      activeOrganization(organization, selectedTeamId)}
+                        activeOrganization(organization, selectedTeamId)}
                   >
                     {activatingOrganizationId === organization.id
-                      ? "..."
-                      : "Open"}
+                        ? "..."
+                        : "Open"}
                   </Button>
                 </div>
               </div>
@@ -214,6 +216,6 @@
           </li>
         {/each}
       </ul>
-    </div>
-  {/if}
+    {/if}
+  </div>
 </div>

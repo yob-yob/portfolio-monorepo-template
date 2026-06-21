@@ -73,6 +73,11 @@
   const userIsAMemberOfTeam = (team: TeamData) =>
     userTeams.some((userTeam) => userTeam.id === team.id);
 
+  const userOnlyHasOneTeam = $derived(() => userTeams.length === 1);
+
+  const userCanLeaveTeam = (team: TeamData) =>
+    userIsAMemberOfTeam(team) && !userOnlyHasOneTeam();
+
   const isActiveTeam = (team: TeamData) => activeTeamId === team.id;
 
   type CreatorLookup = ReturnType<
@@ -134,6 +139,25 @@
   };
 
   const leaveTeam = async (team: TeamData) => {
+    if (!userCanLeaveTeam(team)) {
+      toast.error(
+        `You cannot leave the team: ${team.name}, because this is your only assigned team.`
+      );
+      return;
+    }
+
+    // First move the user to another team...
+    const OtherTeam = userTeams.find((userTeam) => userTeam.id !== team.id);
+
+    if (OtherTeam) {
+      switchTeam(OtherTeam);
+    } else {
+      toast.error(
+        `You cannot leave the team: ${team.name}, because you are the only member of the team.`
+      );
+      return;
+    }
+
     const { error } = await authClient.organization.removeTeamMember({
       teamId: team.id,
       userId,
