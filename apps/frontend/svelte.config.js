@@ -7,6 +7,10 @@ const config = {
     runes: ({ filename }) =>
       // biome-ignore lint/performance/useTopLevelRegex: reason
       filename.split(/[/\\]/).includes("node_modules") ? undefined : true,
+
+    experimental: {
+      async: true,
+    },
   },
   kit: {
     // adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
@@ -16,6 +20,7 @@ const config = {
 
     alias: {
       "@/backend/*": "../../apps/backend/src/*",
+      "@/database/*": "../../packages/database/src/*",
       "@/api-client/*": "../../packages/api-client/src/*",
       "@/auth/client": "../../packages/auth/src/auth-client.ts",
     },

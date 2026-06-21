@@ -28,7 +28,6 @@
   let selectedTeamIds = $state<Record<string, string>>({});
 
   const organizations = authClient.useListOrganizations();
-  const teams = authClient.organization.listUserTeams();
 
   const activeOrganizationId = $derived(
     data.session?.activeOrganizationId ?? null
@@ -174,6 +173,8 @@
                       Switching organization...
                     {:else if organizationTeams.length === 1}
                       1 team available
+                    {:else if organizationTeams.length === 0}
+                      You don't belong to any teams in this organization
                     {:else}
                       {`${organizationTeams.length} teams available`}
                     {/if}

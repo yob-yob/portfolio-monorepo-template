@@ -1,6 +1,6 @@
+import { db } from "@city-os/database/db";
 import { APIError } from "better-auth";
 import { organization } from "better-auth/plugins";
-import { db } from "@/database/node-db.ts";
 
 const checkIfTeamAlreadyExist = async (
   teamName: string,
@@ -22,15 +22,14 @@ const checkIfTeamAlreadyExist = async (
 export const organizationPlugin = organization({
   teams: {
     enabled: true,
+    defaultTeam: {
+      enabled: false,
+    },
   },
 
   organizationHooks: {
     // Before creating a team
     beforeCreateTeam: async ({ team, user, organization }) => {
-      console.log("user", user);
-      console.log("organization", organization);
-      console.log("team", team);
-
       if (!user) {
         throw new APIError("BAD_REQUEST", {
           message: "User not found",

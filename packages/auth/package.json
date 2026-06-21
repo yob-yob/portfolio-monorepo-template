@@ -5,7 +5,9 @@
     "./client": "./src/auth-client.ts"
   },
   "scripts": {
-    "schema:generate": "bun x auth@latest generate --config ./src/auth.ts --output=../database/src/schemas/auth.ts"
+    "cache:clear": "bun run ./src/scripts/clear-secondary-storage.ts",
+    "schema:generate": "bunx --bun auth generate --config=./src/auth.ts --output=../database/src/schemas/auth.ts",
+    "info": "bunx --bun auth info --config=./src/auth.ts"
   },
   "dependencies": {
     "@city-os/mailer": "workspace:*",

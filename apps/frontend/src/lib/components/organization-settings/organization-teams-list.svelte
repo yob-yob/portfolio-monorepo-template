@@ -22,7 +22,20 @@
     createdBy: string;
     id: string;
     name: string;
+    organizationId: string;
   }
+
+  type ListMembersResult = ReturnType<
+    typeof authClient.organization.listMembers<{
+      query: {
+        organizationId: string;
+        limit: number;
+        filterField: "userId";
+        filterOperator: "eq";
+        filterValue: string;
+      };
+    }>
+  >;
 
   let {
     teams,
@@ -86,21 +99,25 @@
 
   const creatorCache = new Map<string, CreatorLookup>();
 
-  const getCreatorName = (creatorUserId: string) => {
+  const getCreatorName = (team: TeamData): ListMembersResult => {
     // cache the result...
-    const cached = creatorCache.get(creatorUserId);
+    const cached = creatorCache.get(team.createdBy);
 
     if (cached) {
       return cached;
     }
 
-    const request = authClient.organization.getActiveMember({
+    const request = authClient.organization.listMembers({
       query: {
-        creatorUserId,
+        organizationId: team.organizationId,
+        limit: 1,
+        filterField: "userId",
+        filterOperator: "eq",
+        filterValue: team.createdBy,
       },
     });
 
-    creatorCache.set(creatorUserId, request);
+    creatorCache.set(team.createdBy, request);
 
     return request;
   };
@@ -278,10 +295,10 @@
                 </div>
                 <div class="text-muted-foreground text-sm">
                   Created {formatRelativeTime(team.createdAt)}
-                  {#await getCreatorName(team.createdBy)}
+                  {#await getCreatorName(team)}
                     <Skeleton class="h-2 w-[100px] inline-block" />
                   {:then creator}
-                    by {creator.data?.user.name}
+                    by {creator.data?.members[0]?.user.name}
                   {:catch error}
                     {@debug error}
                     by Unknown

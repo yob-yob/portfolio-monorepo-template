@@ -1,21 +1,16 @@
-import { redisStorage } from "@better-auth/redis-storage";
-import { db } from "@city-os/database/node/db";
+import { db } from "@city-os/database/db";
 // biome-ignore lint/performance/noNamespaceImport: Importing All Tables from Auth Schema is what we need anyways...
 import * as authSchema from "@city-os/database/schemas/auth";
 import { createId } from "@paralleldrive/cuid2";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { openAPI } from "better-auth/plugins";
-import { Redis } from "ioredis";
+import secondaryStorage from "./config/secondary-storage.ts";
 import { emailOtpPlugin } from "./plugins/mail-otp.ts";
 import { organizationPlugin } from "./plugins/organization.ts";
 
 if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set");
-}
-
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is not set");
 }
 
 if (!process.env.DOMAIN) {
@@ -31,27 +26,6 @@ if (!process.env.DOMAIN) {
   throw new Error("DOMAIN should not have HTTP:// or HTTPS:// prefixes");
 }
 
-function createRedisClient(): Redis {
-  if (process.env.REDIS_URL) {
-    return new Redis(process.env.REDIS_URL);
-  }
-
-  const port = Number(process.env.REDIS_PORT ?? 6379);
-  const db = Number(process.env.REDIS_DB ?? 3);
-
-  if (Number.isNaN(port) || Number.isNaN(db)) {
-    throw new Error("REDIS_PORT and REDIS_DB must be valid numbers");
-  }
-
-  return new Redis({
-    host: process.env.REDIS_HOST ?? "localhost",
-    port,
-    db,
-  });
-}
-
-const redis = createRedisClient();
-
 const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -59,10 +33,7 @@ const auth = betterAuth({
     usePlural: true,
   }),
   deferSessionRefresh: true,
-  secondaryStorage: redisStorage({
-    client: redis,
-    keyPrefix: "city-os:auth:",
-  }),
+  secondaryStorage,
   baseURL: {
     allowedHosts: [
       ...(process.env.APP_ENV === "production" ? [] : ["localhost:*"]),

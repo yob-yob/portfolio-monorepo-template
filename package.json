@@ -7,13 +7,17 @@
     "dev": "bun run --parallel --workspaces --if-present dev",
     "build": "bun run --sequential --workspaces --if-present build",
     "auth:schema:generate": "bun run --cwd ./packages/auth schema:generate",
+    "auth:info": "bun run --cwd ./packages/auth info",
     "db:generate:migrations": "bun run --cwd ./packages/database db:generate",
     "db:migrate:check": "bun run --cwd ./packages/database db:check",
     "db:migrate": "bun run --cwd ./packages/database db:migrate",
+    "db:fresh": "bun run --cwd ./packages/database db:fresh",
+    "db:seed": "bun run --cwd ./packages/database db:seed",
     "serve": "bun run --parallel --workspaces --if-present serve",
     "lint:check": "ultracite check",
     "lint:fix": "ultracite fix",
-    "lint:format": "biome format --write"
+    "lint:format": "biome format --write",
+    "cache:clear": "bun run --parallel --workspaces --if-present cache:clear"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",

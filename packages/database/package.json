@@ -2,16 +2,18 @@
   "name": "@city-os/database",
   "exports": {
     "./schemas/*": "./src/schemas/*.ts",
-    "./db": "./src/db.ts",
-    "./node/db": "./src/node-db.ts"
+    "./db": "./src/db.ts"
   },
   "scripts": {
     "db:generate": "bunx drizzle-kit generate --config ./drizzle.config.ts",
     "db:migrate": "bunx drizzle-kit migrate --config ./drizzle.config.ts",
-    "db:check": "bunx drizzle-kit check --config ./drizzle.config.ts"
+    "db:check": "bunx drizzle-kit check --config ./drizzle.config.ts",
+    "db:fresh": "bun ./src/fresh.ts",
+    "db:seed": "bun ./src/seeders/index.ts"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^3.3.0",
+    "better-auth": "^1.6.11",
     "drizzle-orm": "^0.45.2",
     "drizzle-seed": "^0.3.1",
     "drizzle-typebox": "^0.3.3",
